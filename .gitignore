@@ -210,3 +210,6 @@ __marimo__/
 data/processed/
 data/raw/
 .directory
+data/vector_db/
+__pycache__/
+*.ds_store
