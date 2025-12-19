@@ -10,7 +10,7 @@ SRC_DIR = os.path.join(PROJECT_ROOT, "src")
 sys.path.insert(0, SRC_DIR)
 
 from ingestion.embeddings import EmbeddingFactory
-from ingest import LangchainEmbeddingFunctionWrapper, VECTOR_DB_DIR, CHROMA_COLLECTION_NAME
+from ingestion.vector_store import LangchainEmbeddingFunctionWrapper, VECTOR_DB_DIR, CHROMA_COLLECTION_NAME
 
 def inspect_vector_db(limit: int = 5):
     """
