@@ -36,6 +36,15 @@ class DataLoaderFactory:
         ".js": TextLoader,
         ".json": TextLoader,
         ".html": TextLoader,
+        ".css": TextLoader,
+        ".scss": TextLoader,
+        ".xml": TextLoader,
+        ".yaml": TextLoader,
+        ".yml": TextLoader,
+        ".bib": TextLoader,
+        ".bbl": TextLoader,
+        ".properties": TextLoader,
+        ".http": TextLoader,
         ".doc": UnstructuredWordDocumentLoader,
         ".docx": UnstructuredWordDocumentLoader,
         ".ipynb": NotebookLoader
@@ -47,6 +56,11 @@ class DataLoaderFactory:
         loader_class = DataLoaderFactory.LOADERS.get(ext)
         if not loader_class:
             raise ValueError(f"Formato no soportado: {ext}")
+        
+        # Para TextLoader, activamos autodetect_encoding para evitar fallos con tildes/ñ en archivos no-UTF8
+        if loader_class == TextLoader:
+            return loader_class(file_path, autodetect_encoding=True)
+            
         return loader_class(file_path)
 
 class IngestionLoader:
@@ -72,9 +86,8 @@ class IngestionLoader:
         file_hash = IngestionLoader._calculate_file_hash(file_path)
         
         for i, doc in enumerate(docs):
-            # --- CORRECCIÓN: Convertir la ruta 'source' a relativa ---
             # Los loaders de Langchain guardan por defecto una ruta absoluta.
-            # La convertimos a una ruta relativa al raíz del proyecto para portabilidad.
+            # La convertimos a una ruta relativa a la raíz del proyecto para portabilidad.
             if "source" in doc.metadata:
                 doc.metadata["source"] = os.path.relpath(doc.metadata["source"], start=PROJECT_ROOT)
 
@@ -83,12 +96,7 @@ class IngestionLoader:
             doc.metadata["file_type"] = os.path.splitext(file_path)[1]
             doc.metadata["parent_folder"] = os.path.basename(os.path.dirname(file_path))
             
-            # Clasificación de código (Python y Java)
-            file_type = doc.metadata["file_type"].lower()
-            if file_type in [".py", ".java"]:
-                doc.metadata["category"] = "code_snippet"
-            else:
-                doc.metadata["category"] = "documentation"
+            doc.metadata["category"] = "documentation"
                 
             enriched_docs.append(doc)
             
