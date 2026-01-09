@@ -1,0 +1,20 @@
+services:
+  neo4j:
+    image: neo4j:5.18.0
+    container_name: tutoris_graph_db
+    ports:
+      - "7474:7474" # HTTP (Browser)
+      - "7687:7687" # Bolt (Conexión Python)
+    volumes:
+      # Guardamos los datos en carpeta local 'data'
+      - ./data/neo4j_data:/data
+    environment:
+      - NEO4J_AUTH=${NEO4J_USERNAME:-neo4j}/${NEO4J_PASSWORD:-password123}
+      # Habilitamos APOC para futuras limpiezas de nodos duplicados
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider localhost:7474 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

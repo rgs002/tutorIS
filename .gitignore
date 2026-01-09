@@ -213,3 +213,7 @@ data/raw/
 data/vector_db/
 __pycache__/
 *.ds_store
+
+
+## Archivos de la Graph DB
+data/neo4j_data/
