@@ -29,48 +29,75 @@ DEBUG_SAVE_CHUNKS = True  # True: guarda copia de chunks en disco. False: solo v
 SHOW_PROGRESS_BAR = True  # Muestra una barra de progreso en consola
 CHROMA_COLLECTION_NAME = "tutoris_collection"
 
-# ---------------ONTOLOGIA DEL GRAFO--------------------------------
+# --------------- ONTOLOGIA DEL GRAFO (OPTIMIZADA) ----------------
 
 NODOS = [
-    # NIVEL ACADÉMICO 
-    "Tema", "Asignatura", "ConceptoTeorico", "Definicion", 
-    "Metodologia", "Principio", "Autor", "Bibliografia",
+    # 1. BLOQUE ACADÉMICO Y EVALUACIÓN (Para "Exámenes de otros años", "mejorar nota")
+    "Asignatura",       # Contexto general
+    "Tema",             # Temario teórico
+    "Examen",           # "Examenes de otros años"
+    "PreguntaExamen",   # Preguntas específicas dentro de exámenes
+    "Practica",         # Entregables mayores
+    "Entregable",       # "Manual de usuario", "APK", "Plan de Calidad"
+    "CriterioEvaluacion", # "Rubrica", "Cómo mejorar la nota"
     
-    # NIVEL PRÁCTICO / EJERCICIOS 
-    "Practica", "GuiaLaboratorio", "Ejercicio", "Tecnologia", 
-    "Herramienta", "Comando", "Tip", # (Para tus tips/androidTips.md)
+    # 2. BLOQUE AGILE Y GESTIÓN (Para "Sprints", "Estimaciones", "Historias")
+    "Metodologia",      # Scrum, Agile
+    "Evento",           # "Sprint 0", "Sprint 2", "Daily"
+    "Artefacto",        # Generalización para Ticket, HU
+    "HistoriaUsuario",  # "Tener una sola HU", "HU opcional"
+    "Ticket",           # "Tienen que definir pruebas", "Hotfix"
+    "Tarea",            # "Crear rama por tarea", "Asignar tareas"
+    "Rol",              # Scrum Master, Product Owner
+    
+    # 3. BLOQUE NORMATIVO Y REGLAS (CRÍTICO: Para "¿Cómo debo nombrar?", "¿Es obligatorio?")
+    "Regla",            # Nomenclaturas, Normas de Git, "Definición de Completado"
+    "Procedimiento",    # "Cómo se crea un sprint", "Cómo se organiza"
+    "Metrica",          # "horas", "Puntos de esfuerzo", "Velocidad"
+    "Herramienta",      # "Scrumdesk", "Git"
 
-    # NIVEL GESTIÓN Y SCRUM
-    "Rol", "Evento", "Artefacto", "HistoriaUsuario", "Tarea",
-    "Metrica", "CriterioCalidad", "Rubrica", "Riesgo",
+    # 4. BLOQUE TÉCNICO Y CÓDIGO (Para "SharedPreferences", "Threads", "Espresso")
+    "ConceptoTecnico",  # "Valores anómalos", "Thread.Sleep", "Capa de negocio"
+    "Tecnologia",       # "Android", "Espresso", "Java"
+    "ElementoUI",       # "SearchView", "Toolbar", "Icono"
+    "Paquete",          # Ubicación de clases
+    "Clase",            # "Clases de prueba", "Clase modificada"
+    "Metodo",           # "Probar un método", "UnitTest"
+    "Rama",             # Git branches
     
-    # NIVEL CÓDIGO (Para isunican-chat-main)
-    "Archivo", "Clase", "Metodo", "Funcion", "Variable",
-    "Endpoint", "ModeloDatos", "Dependencia", # (Para package.json)
-    "Excepcion", "Test"
+    # 5. BLOQUE DE CALIDAD Y PRUEBAS (Para "Plan de pruebas", "Casos de prueba")
+    "PlanPruebas",      # El documento en sí
+    "TipoPrueba",       # Unitaria, Integración, UI
+    "CasoPrueba",       # El caso específico
+    "Escenario"         # "Valores de entrada", "Día festivo"
 ]
 
 RELACIONES = [
-    # Relaciones de Contenido
-    "EXPLICA",            # Tema -> ConceptoTeorico
-    "SE_MENCIONA_EN",     # Concepto -> Diapositiva/Archivo
-    "DEFINE",             # Archivo -> Definicion
-    "TIENE_RUBRICA",      # Practica/Entregable -> Rubrica
-
-    # Relaciones Técnicas
-    "UTILIZA_TECNOLOGIA", # Practica -> Tecnologia
-    "REQUIERE_LIBRERIA",  # Proyecto -> Dependencia
-    "EXPONE_RUTA",        # Server -> Endpoint
-    "IMPLEMENTA",         # Clase -> Interfaz / Codigo -> HistoriaUsuario
+    # RELACIONES DE JERARQUÍA Y CONTENIDO
+    "PERTENECE_A_TEMA",   # PreguntaExamen -> Tema
+    "EVALUA",             # Examen -> Tema / Practica -> ConceptoTecnico
+    "CONTIENE",           # PlanPruebas -> CasoPrueba / Sprint -> HistoriaUsuario
     
-    # Relaciones Metodológicas
-    "PERTENECE_A_FASE",   # Tarea -> Fase
-    "GENERA_ARTEFACTO",   # Evento -> Artefacto (Sprint -> Incremento)
-    "VALIDA_CRITERIO",    # Test -> CriterioCalidad
+    # RELACIONES DE NORMATIVA (Para responder "¿Es obligatorio?", "¿Cómo se llama?")
+    "SIGUE_REGLA",        # Rama -> Regla (Nomenclatura)
+    "REQUIERE",           # Ticket -> Definición de Completado / HistoriaUsuario -> Criterios
+    "DEFINE",             # Regla -> Formato
+    "ESTIMA_EN",          # Tarea -> Metrica (Puntos/Horas)
     
-    # Relaciones de Estructura
-    "CONTIENE",           # Carpeta -> Archivo / Tema -> Seccion
-    "REFERENCIA_A"        # Documento -> Bibliografia
+    # RELACIONES DE PROCEDIMIENTO (Para "¿Cómo hago X?")
+    "SE_REALIZA_EN",      # Crear Sprint -> Scrumdesk
+    "GENERA_ENTREGABLE",  # Practica -> APK / Manual
+    
+    # RELACIONES TÉCNICAS (Para "¿Dónde está?", "¿Qué usa?")
+    "UBICADO_EN",         # Clase -> Paquete
+    "EXTIENDE_DE",        # Clase -> Clase (Herencia)
+    "UTILIZA_UI",         # Test -> ElementoUI 
+    "GESTIONA",           # ServicioDatos -> Valores Anómalos
+    
+    # RELACIONES TEMPORALES Y DE FLUJO
+    "BLOQUEA_A",          # Fallo Sprint 0 -> Sprint 2
+    "AFECTA_A",           # Día Festivo -> Velocidad de Equipo
+    "SE_DESCOMPONE_EN"    # HistoriaUsuario -> Tareas 
 ]
 # ------------------------------------------------------------------
 
@@ -206,7 +233,7 @@ def main():
                 print(f"  -> [VECTOR] {len(chunks)} chunks guardados en ChromaDB.")
 
                 # RUTA B: Grafo (Con gestión de Rate Limits y Reintentos)
-                print(f"  -> [GRAFO] Analizando {len(chunks)} chunks uno a uno con esperas...")
+                print(f"  -> [GRAFO] Analizando {len(chunks)} chunks uno a uno...")
                 
                 chunks_with_graph = 0
                 for i, chunk in enumerate(chunks):
@@ -226,13 +253,10 @@ def main():
                             
                             success = True
                             
-                            # PAUSA PREVENTIVA: Dormimos 4 segundos entre llamadas para enfriar la API
-                            # Esto evita que salte el error en primer lugar
-                            time.sleep(4) 
 
                         except Exception as e:
                             error_msg = str(e)
-                            # Si es error de cuota (429), esperamos y reintentamos
+                            # Si es error de cuota (429), esperamos y reintentamos (OLD)
                             if "429" in error_msg or "RESOURCE_EXHAUSTED" in error_msg:
                                 wait_time = 30 * (attempt + 1) # Espera progresiva: 30s, 60s, 90s...
                                 print(f"     [RATE LIMIT] Pausando {wait_time}s antes de reintentar chunk {i+1}/{len(chunks)}...")
