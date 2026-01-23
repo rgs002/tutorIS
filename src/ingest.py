@@ -4,6 +4,7 @@ import argparse
 import shutil
 import json
 from datetime import datetime
+import concurrent.futures
 
 # Integración de Embeddings y VectorDB
 from ingestion.embeddings import EmbeddingFactory
@@ -16,6 +17,7 @@ from ingestion.registry import IngestionRegistry
 from ingestion.graph_store import GraphDBManager
 from langchain_experimental.graph_transformers import LLMGraphTransformer
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_community.graphs.graph_document import Node, Relationship
 
 # Obtenemos la ruta del directorio raíz del proyecto (un nivel por encima de 'src')
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
@@ -32,74 +34,45 @@ CHROMA_COLLECTION_NAME = "tutoris_collection"
 # --------------- ONTOLOGIA DEL GRAFO (OPTIMIZADA) ----------------
 
 NODOS = [
-    # 1. BLOQUE ACADÉMICO Y EVALUACIÓN (Para "Exámenes de otros años", "mejorar nota")
-    "Asignatura",       # Contexto general
-    "Tema",             # Temario teórico
-    "Examen",           # "Examenes de otros años"
-    "PreguntaExamen",   # Preguntas específicas dentro de exámenes
-    "Practica",         # Entregables mayores
-    "Entregable",       # "Manual de usuario", "APK", "Plan de Calidad"
-    "CriterioEvaluacion", # "Rubrica", "Cómo mejorar la nota"
-    
-    # 2. BLOQUE AGILE Y GESTIÓN (Para "Sprints", "Estimaciones", "Historias")
-    "Metodologia",      # Scrum, Agile
-    "Evento",           # "Sprint 0", "Sprint 2", "Daily"
-    "Artefacto",        # Generalización para Ticket, HU
-    "HistoriaUsuario",  # "Tener una sola HU", "HU opcional"
-    "Ticket",           # "Tienen que definir pruebas", "Hotfix"
-    "Tarea",            # "Crear rama por tarea", "Asignar tareas"
-    "Rol",              # Scrum Master, Product Owner
-    
-    # 3. BLOQUE NORMATIVO Y REGLAS (CRÍTICO: Para "¿Cómo debo nombrar?", "¿Es obligatorio?")
-    "Regla",            # Nomenclaturas, Normas de Git, "Definición de Completado"
-    "Procedimiento",    # "Cómo se crea un sprint", "Cómo se organiza"
-    "Metrica",          # "horas", "Puntos de esfuerzo", "Velocidad"
-    "Herramienta",      # "Scrumdesk", "Git"
-
-    # 4. BLOQUE TÉCNICO Y CÓDIGO (Para "SharedPreferences", "Threads", "Espresso")
-    "ConceptoTecnico",  # "Valores anómalos", "Thread.Sleep", "Capa de negocio"
-    "Tecnologia",       # "Android", "Espresso", "Java"
-    "ElementoUI",       # "SearchView", "Toolbar", "Icono"
-    "Paquete",          # Ubicación de clases
-    "Clase",            # "Clases de prueba", "Clase modificada"
-    "Metodo",           # "Probar un método", "UnitTest"
-    "Rama",             # Git branches
-    
-    # 5. BLOQUE DE CALIDAD Y PRUEBAS (Para "Plan de pruebas", "Casos de prueba")
-    "PlanPruebas",      # El documento en sí
-    "TipoPrueba",       # Unitaria, Integración, UI
-    "CasoPrueba",       # El caso específico
-    "Escenario"         # "Valores de entrada", "Día festivo"
+    "ConceptoTeorico",
+    "Metodologia",
+    "Tecnologia",
+    "Artefacto",
+    "Documento"
 ]
 
 RELACIONES = [
-    # RELACIONES DE JERARQUÍA Y CONTENIDO
-    "PERTENECE_A_TEMA",   # PreguntaExamen -> Tema
-    "EVALUA",             # Examen -> Tema / Practica -> ConceptoTecnico
-    "CONTIENE",           # PlanPruebas -> CasoPrueba / Sprint -> HistoriaUsuario
-    
-    # RELACIONES DE NORMATIVA (Para responder "¿Es obligatorio?", "¿Cómo se llama?")
-    "SIGUE_REGLA",        # Rama -> Regla (Nomenclatura)
-    "REQUIERE",           # Ticket -> Definición de Completado / HistoriaUsuario -> Criterios
-    "DEFINE",             # Regla -> Formato
-    "ESTIMA_EN",          # Tarea -> Metrica (Puntos/Horas)
-    
-    # RELACIONES DE PROCEDIMIENTO (Para "¿Cómo hago X?")
-    "SE_REALIZA_EN",      # Crear Sprint -> Scrumdesk
-    "GENERA_ENTREGABLE",  # Practica -> APK / Manual
-    
-    # RELACIONES TÉCNICAS (Para "¿Dónde está?", "¿Qué usa?")
-    "UBICADO_EN",         # Clase -> Paquete
-    "EXTIENDE_DE",        # Clase -> Clase (Herencia)
-    "UTILIZA_UI",         # Test -> ElementoUI 
-    "GESTIONA",           # ServicioDatos -> Valores Anómalos
-    
-    # RELACIONES TEMPORALES Y DE FLUJO
-    "BLOQUEA_A",          # Fallo Sprint 0 -> Sprint 2
-    "AFECTA_A",           # Día Festivo -> Velocidad de Equipo
-    "SE_DESCOMPONE_EN"    # HistoriaUsuario -> Tareas 
+    "USA",            # Dependencia (Metodología -> Tecnología)
+    "GENERA",         # Producción (Metodología -> Artefacto)
+    "IMPLEMENTA",     # Realización (Tecnología -> Concepto / Artefacto -> Diseño)
+    "COMPONE",        # Relación estructural (Artefacto -> Artefacto / Concepto -> Concepto)
+    "REQUISITO_PARA", # Dependencia lógica o de flujo (Requisito -> Diseño)
+    "ASOCIADO_A",     # Vínculo semántico fuerte cuando no encaja en las anteriores
+    "MENCIONADO_EN"   # Trazabilidad de fuentes
 ]
-# ------------------------------------------------------------------
+
+# --------------- PROMPT DE NORMALIZACIÓN (SISTEMA) ---------------
+NORMALIZATION_PROMPT = """
+Actúa como un Extractor de Grafos de Conocimiento estricto para Ingeniería del Software. 
+Tu objetivo es extraer nodos y relaciones de fragmentos de texto siguiendo estas reglas de **Normalización de Nombres**:
+
+1. **Canonización:** Usa nombres simples y directos. Elimina artículos, adjetivos innecesarios y prefijos.
+   * *Mal:* 'La metodología Scrum', 'Marco de trabajo Ágil'.
+   * *Bien:* 'Scrum', 'Agile'.
+
+2. **Singularización:** Usa siempre el singular (ej. 'Historia de Usuario' en lugar de 'Historias de Usuario').
+
+3. **Ontología Cerrada:** Clasifica CADA nodo exclusivamente en una de estas 4 etiquetas: `ConceptoTeorico`, `Metodologia`, `Tecnologia`, `Artefacto`.
+
+4. **Resolución In-Situ:** Si el texto menciona un acrónimo y su nombre completo (ej. 'User Story' y 'US'), usa siempre el nombre más descriptivo ('User Story') para ambos.
+
+5. **Idioma:** Mantén los términos técnicos en su idioma original de la asignatura (normalmente inglés para conceptos de software como 'Sprint' o 'Backlog') para evitar duplicados por traducción.
+
+6. **Propiedades (CRÍTICO):**
+   - Para cada nodo extraído, DEBES generar una propiedad llamada `definition`.
+   - La definición debe ser breve (15-20 palabras) y basada **EXCLUSIVAMENTE** en el contexto del texto proporcionado.
+   - Si el texto no define el concepto explícitamente, infiere una definición funcional basada en cómo se usa en el texto.
+"""
 
 # Extensiones que sabemos que no son texto y queremos ignorar silenciosamente
 IGNORED_EXTENSIONS = {
@@ -108,6 +81,43 @@ IGNORED_EXTENSIONS = {
     ".pyc", ".class", ".dll", ".so", ".exe", # Binarios/Compilados
     ".pack", ".idx", ".rev", ".sample", ".vsd" # Git internals y Visio binario
 }
+
+def create_vector_indices(graph_manager, embedding_model, force_reset=False):
+    """Crea índices vectoriales en Neo4j para cada tipo de nodo definido en la ontología."""
+    print("  -> [GRAFO] Verificando índices vectoriales...")
+    
+    # Detectar dimensión dinámicamente para evitar errores de mismatch (384 vs 768)
+    try:
+        dummy_vec = embedding_model.embed_query("test")
+        dimension = len(dummy_vec)
+        print(f"  -> [GRAFO] Dimensión de embeddings detectada: {dimension}")
+    except Exception as e:
+        print(f"  -> [ADVERTENCIA] No se pudo detectar dimensión, usando 768 por defecto. Error: {e}")
+        dimension = 768
+
+    try:
+        for node_type in NODOS:
+            index_name = f"vector_{node_type}"
+            
+            # SOLO borramos el índice si se ha solicitado un reset explícito
+            if force_reset:
+                try:
+                    graph_manager.graph.query(f"DROP INDEX {index_name} IF EXISTS")
+                except:
+                    pass
+
+            query = f"""
+            CREATE VECTOR INDEX {index_name} IF NOT EXISTS
+            FOR (n:{node_type})
+            ON (n.embedding)
+            OPTIONS {{indexConfig: {{
+                `vector.dimensions`: {dimension},
+                `vector.similarity_function`: 'cosine'
+            }}}}
+            """
+            graph_manager.graph.query(query)
+    except Exception as e:
+        print(f"  -> [ADVERTENCIA] Error verificando índices vectoriales: {e}")
 
 def reset_system(registry: IngestionRegistry):
     """Limpi Registro, Chunks, VectorDB y GraphDB."""
@@ -136,10 +146,105 @@ def reset_system(registry: IngestionRegistry):
 
     print("[SISTEMA] Limpieza completada.\n")
 
+def process_chunk_graph(args):
+    """Procesa un chunk individual para extraer y guardar grafo (Thread-Safe)."""
+    chunk, i, total_chunks, llm_transformer, graph_db_manager, embedding_model, filename, file_rel_path = args
+    max_retries = 3
+    attempt = 0
+    
+    while attempt < max_retries:
+        try:
+            # 1. Intentamos procesar UN solo chunk
+            mini_graph = llm_transformer.convert_to_graph_documents([chunk])
+            
+            # --- TRAZABILIDAD DE FUENTES ---
+            if mini_graph:
+                doc_node = Node(
+                    id=filename, 
+                    type="Documento", 
+                    properties={"path": file_rel_path, "definition": "Archivo fuente del proyecto"}
+                )
+                
+                for doc in mini_graph:
+                    doc.nodes.append(doc_node)
+                    extracted_nodes = [n for n in doc.nodes if n.id != filename]
+                    for node in extracted_nodes:
+                        node.properties["source_file"] = filename
+                        rel = Relationship(source=node, target=doc_node, type="MENCIONADO_EN")
+                        doc.relationships.append(rel)
+
+            # --- NORMALIZACIÓN Y ENRIQUECIMIENTO ---
+            if mini_graph:
+                label_map = {n.lower().replace(" ", ""): n for n in NODOS}
+
+                for doc in mini_graph:
+                    # 1. Normalizar nodos
+                    for node in doc.nodes:
+                        clean_type = node.type.strip()
+                        lookup_key = clean_type.lower().replace(" ", "")
+                        if lookup_key in label_map:
+                            node.type = label_map[lookup_key]
+
+                    # 2. Normalizar relaciones
+                    for rel in doc.relationships:
+                        for n in [rel.source, rel.target]:
+                            lk = n.type.strip().lower().replace(" ", "")
+                            if lk in label_map:
+                                n.type = label_map[lk]
+
+                    # 3. Enriquecimiento
+                    for node in doc.nodes:
+                        new_def = node.properties.pop("definition", None)
+                        
+                        # 1. Calcular Embedding (antes de guardar nada)
+                        text_rep = f"{node.id}"
+                        if new_def:
+                            text_rep += f": {new_def}"
+                        
+                        embedding = embedding_model.embed_query(text_rep)
+                        node.properties["embedding"] = embedding
+
+                        if new_def:
+                            cypher_merge = f"""
+                            MERGE (n:`{node.type}` {{id: $id}})
+                            ON CREATE SET n.definition = $new_def, n.embedding = $embedding
+                            ON MATCH SET 
+                                n.embedding = $embedding,
+                                n.definition = 
+                                CASE 
+                                    WHEN n.definition IS NULL OR n.definition = "" THEN $new_def
+                                    WHEN NOT n.definition CONTAINS $new_def THEN n.definition + " | " + $new_def
+                                    ELSE n.definition
+                                END
+                            """
+                            graph_db_manager.graph.query(cypher_merge, {
+                                "id": node.id, 
+                                "new_def": new_def, 
+                                "embedding": embedding
+                            })
+            
+            if mini_graph:
+                graph_db_manager.add_graph_documents(mini_graph)
+                return 1
+            return 0
+
+        except Exception as e:
+            error_msg = str(e)
+            if "429" in error_msg or "RESOURCE_EXHAUSTED" in error_msg:
+                wait_time = 30 * (attempt + 1)
+                print(f"     [RATE LIMIT] Pausando {wait_time}s antes de reintentar chunk {i+1}/{total_chunks}...")
+                time.sleep(wait_time)
+                attempt += 1
+            else:
+                print(f"     [Chunk {i+1}] Error no recuperable: {e}")
+                break 
+    return 0
+
 def main():
     parser = argparse.ArgumentParser(description="Sistema de Ingesta RAG")
     parser.add_argument("--clear", action="store_true", help="Limpia el registro y los chunks y termina el proceso.")
     parser.add_argument("--reset", action="store_true", help="Limpia y re-ingesta todos los archivos desde cero.")
+    parser.add_argument("--update", action="store_true", help="Realiza una ingesta incremental (solo archivos nuevos o modificados).")
     parser.add_argument("--force", action="store_true", help="Fuerza el re-procesamiento.")
     args = parser.parse_args()
 
@@ -151,6 +256,8 @@ def main():
         reset_system(registry)
         if args.clear:
             return
+    elif args.update:
+        print("[SISTEMA] Modo Update activado: Se procesarán solo archivos nuevos o modificados.")
 
     # Inicialización de ChromaDB y Embeddings
     print("[SISTEMA] Inicializando componentes de Embeddings y VectorDB...")
@@ -170,8 +277,12 @@ def main():
         llm_transformer = LLMGraphTransformer(
             llm=llm_for_graph,
             allowed_nodes=NODOS,
-            allowed_relationships=RELACIONES
+            allowed_relationships=RELACIONES,
+            # Inyectamos las instrucciones estrictas de normalización
+            additional_instructions=NORMALIZATION_PROMPT,
+            node_properties=["definition"] # Forzamos la extracción de esta propiedad
         )
+        create_vector_indices(graph_db_manager, embedding_model, force_reset=args.reset)
         print("  -> [SISTEMA] Conexión con Neo4j y LLM de Grafos establecida.")
         
     except Exception as e:
@@ -233,39 +344,17 @@ def main():
                 print(f"  -> [VECTOR] {len(chunks)} chunks guardados en ChromaDB.")
 
                 # RUTA B: Grafo (Con gestión de Rate Limits y Reintentos)
-                print(f"  -> [GRAFO] Analizando {len(chunks)} chunks uno a uno...")
+                print(f"  -> [GRAFO] Analizando {len(chunks)} chunks en paralelo (Workers: 4)...")
                 
-                chunks_with_graph = 0
-                for i, chunk in enumerate(chunks):
-                    max_retries = 3
-                    attempt = 0
-                    success = False
+                chunk_args = [
+                    (chunk, i, len(chunks), llm_transformer, graph_db_manager, embedding_model, filename, file_rel_path)
+                    for i, chunk in enumerate(chunks)
+                ]
 
-                    while attempt < max_retries and not success:
-                        try:
-                            # 1. Intentamos procesar UN solo chunk
-                            mini_graph = llm_transformer.convert_to_graph_documents([chunk])
-                            
-                            # 2. Si hay éxito, guardamos inmediatamente en Neo4j
-                            if mini_graph:
-                                graph_db_manager.add_graph_documents(mini_graph)
-                                chunks_with_graph += 1
-                            
-                            success = True
-                            
-
-                        except Exception as e:
-                            error_msg = str(e)
-                            # Si es error de cuota (429), esperamos y reintentamos (OLD)
-                            if "429" in error_msg or "RESOURCE_EXHAUSTED" in error_msg:
-                                wait_time = 30 * (attempt + 1) # Espera progresiva: 30s, 60s, 90s...
-                                print(f"     [RATE LIMIT] Pausando {wait_time}s antes de reintentar chunk {i+1}/{len(chunks)}...")
-                                time.sleep(wait_time)
-                                attempt += 1
-                            else:
-                                # Si es otro error, lo mostramos y saltamos al siguiente chunk
-                                print(f"     [Chunk {i+1}] Error no recuperable: {e}")
-                                break 
+                with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+                    results = list(executor.map(process_chunk_graph, chunk_args))
+                
+                chunks_with_graph = sum(results)
 
                 print(f"  -> [GRAFO] Procesamiento completado. {chunks_with_graph}/{len(chunks)} chunks generaron grafos.")
                 
