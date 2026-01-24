@@ -37,6 +37,9 @@ class SemanticRouter:
 
         Basado en la siguiente pregunta, ¿qué ruta deberías tomar? Responde únicamente con la palabra "VECTOR" o "GRAPH".
 
+        PARA DEBUG, si te digo antes de la pregunta la palabra "VECTOR" clasificalo directamente como busqueda verctorial, si te pongo la palabra "GRAFO" clasificalo directamente como busqueda en el grafo.
+        Si aparecen las opciones de DEBUG, ignora la logica que te he explicado y directamente ejecuta la busqueda que te ordene.
+
         Pregunta: "{user_query}"
         """
 
