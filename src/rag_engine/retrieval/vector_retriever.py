@@ -3,6 +3,7 @@
 import os
 from dotenv import load_dotenv
 import chromadb
+from sentence_transformers import CrossEncoder
 from ingestion.vector_store import VECTOR_DB_DIR, CHROMA_COLLECTION_NAME, LangchainEmbeddingFunctionWrapper
 from ingestion.embeddings import EmbeddingFactory
 
@@ -17,7 +18,9 @@ class VectorRetriever:
         """
         Preparamos la conexión a ChromaDB y el modelo de embeddings.
         """
-        self.default_k = int(os.getenv("RETRIEVAL_K", 5))
+        self.default_k = int(os.getenv("RETRIEVAL_K", 10))
+        self.top_n = 5
+        self.rerank_model = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
         raw_embeddings = EmbeddingFactory.get_embeddings()
         self.embedding_function = LangchainEmbeddingFunctionWrapper(raw_embeddings)
 
@@ -62,7 +65,17 @@ class VectorRetriever:
             # Generalmente, distancias > 1.0 o 1.2 indican baja relevancia.
             print(f"  -> Distancias de los resultados (menor es mejor): {[f'{d:.4f}' for d in distances[0]]}")
 
-            return documents[0]
+            # --- Lógica de Re-ranking ---
+            candidates = documents[0]
+            pairs = [[query, doc] for doc in candidates]
+            scores = self.rerank_model.predict(pairs)
+
+            # Combinar documentos con puntuaciones, ordenar descendente y filtrar top_n
+            scored_docs = sorted(zip(candidates, scores), key=lambda x: x[1], reverse=True)
+            final_docs = [doc for doc, score in scored_docs[:self.top_n]]
+
+            print(f"  -> Re-ranking completado. Top {len(final_docs)} documentos seleccionados.")
+            return final_docs
 
         except Exception as e:
             print(f"Error durante la recuperación de ChromaDB: {e}")
