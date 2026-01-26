@@ -143,7 +143,7 @@ class GraphRetriever:
             print(f"  -> [ERROR FUENTES] {e}")
             return []
 
-    def query(self, user_query: str) -> str:
+    def query(self, user_query: str) -> tuple[str, str]:
         try:
             print(f"  -> [GRAFO] Buscando anclas para: '{user_query}'")
             
@@ -152,7 +152,7 @@ class GraphRetriever:
             
             if not anchors:
                 print("  -> [GRAFO] No se encontraron anclas.")
-                return "No encontré referencias exactas en el grafo de conocimiento para tu consulta."
+                return "No encontré referencias exactas en el grafo de conocimiento para tu consulta.", ""
 
             anchor_names = [a['name'] for a in anchors]
             print(f"  -> [GRAFO] Anclas encontradas: {len(anchors)}")
@@ -175,8 +175,8 @@ class GraphRetriever:
             chain = self.qa_prompt | self.llm | StrOutputParser()
             response = chain.invoke({"context": full_context, "sources": sources_str, "question": user_query})
             
-            return response
+            return response, f"{full_context}\n\nFuentes:\n{sources_str}"
 
         except Exception as e:
             print(f"  -> [ERROR GRAFO] {e}")
-            return "Ocurrió un error técnico al consultar el grafo de conocimiento."
+            return "Ocurrió un error técnico al consultar el grafo de conocimiento.", ""
