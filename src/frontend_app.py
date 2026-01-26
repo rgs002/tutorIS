@@ -170,10 +170,19 @@ def get_engine():
 
 def main():
     
-    st.title("TutorIS")
+    st.markdown("""
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <h1 style="font-family: 'Helvetica Neue', sans-serif; font-weight: 700; font-size: 3.5rem; margin-bottom: 0; color: #2668ED;">
+                TutorIS
+            </h1>
+            <p style="font-family: 'Helvetica Neue', sans-serif; font-weight: 300; font-size: 1.2rem; color: #7f8c8d; margin-top: 0.2rem;">
+                Tutor especializado en Ingeniería del Software
+            </p>
+        </div>
+    """, unsafe_allow_html=True)
     
     # Tabs
-    tab_chat, tab_ingest, tab_system = st.tabs(["Asistente", "Datos", "Sistema"])
+    tab_chat, tab_ingest, tab_system = st.tabs(["Asistente", "Gestión", "Estado del Sistema"])
 
     # PESTANA 3: SISTEMA 
     with tab_system:
@@ -206,49 +215,87 @@ def main():
     with tab_ingest:
         st.header("Base de Conocimiento")
         
-        if "confirm_ingest" not in st.session_state:
-            st.session_state.confirm_ingest = False
-        
-        # Variable para controlar la ejecución fuera del flujo de botones
-        if "ejecutar_ahora" not in st.session_state:
-            st.session_state.ejecutar_ahora = False
+        # Inicialización de estados para gestión de acciones
+        if "pending_action" not in st.session_state:
+            st.session_state.pending_action = None
+        if "executing_action" not in st.session_state:
+            st.session_state.executing_action = None
 
-        if not st.session_state.confirm_ingest and not st.session_state.ejecutar_ahora:
-            if st.button("Re-ingesta Completa (Reset)"):
-                st.session_state.confirm_ingest = True
-                st.rerun()
+        # 1. BOTONES PRINCIPALES (Solo visibles si no hay nada pendiente ni ejecutando)
+        if not st.session_state.pending_action and not st.session_state.executing_action:
+            col_reset, col_update, col_clear = st.columns(3)
+            
+            with col_reset:
+                if st.button("Re-ingesta (Reset)", use_container_width=True):
+                    st.session_state.pending_action = "reset"
+                    st.rerun()
+            
+            with col_update:
+                if st.button("Actualizar (Update)", use_container_width=True):
+                    st.session_state.pending_action = "update"
+                    st.rerun()
+            
+            with col_clear:
+                if st.button("Limpiar (Clear)", use_container_width=True):
+                    st.session_state.pending_action = "clear"
+                    st.rerun()
 
-        if st.session_state.confirm_ingest:
+        # 2. CONFIRMACIÓN
+        if st.session_state.pending_action:
+            action = st.session_state.pending_action
             with st.container(border=True):
-                st.error("ATENCION: BORRADO Y RECONSTRUCCION")
-                st.markdown("Esto eliminara la base de datos actual y procesara los documentos desde cero.")
+                if action == "reset":
+                    st.error("⚠️ CONFIRMAR RESET COMPLETO")
+                    st.markdown("Se **borrará toda la base de datos** y se procesarán todos los documentos desde cero. Esta operación puede tardar.")
+                elif action == "update":
+                    st.warning("⚠️ CONFIRMAR ACTUALIZACIÓN")
+                    st.markdown("Se procesarán solo los archivos **nuevos o modificados**. Los datos existentes se mantendrán.")
+                elif action == "clear":
+                    st.warning("⚠️ CONFIRMAR LIMPIEZA TOTAL")
+                    st.markdown("Se **borrará toda la base de datos** (Vectores y Grafo) y el registro de archivos. **NO** se iniciará la re-ingesta.")
+
                 col_yes, col_no = st.columns(2)
                 with col_yes:
-                    # Al hacer clic, activamos la ejecución y cerramos la confirmación
                     if st.button("SI, Proceder", type="primary", use_container_width=True):
-                        st.session_state.confirm_ingest = False
-                        st.session_state.ejecutar_ahora = True
+                        st.session_state.executing_action = action
+                        st.session_state.pending_action = None
                         st.rerun()
                 with col_no:
                     if st.button("Cancelar", use_container_width=True):
-                        st.session_state.confirm_ingest = False
+                        st.session_state.pending_action = None
                         st.rerun()
 
-        # BLOQUE DE LOGS 
-        if st.session_state.ejecutar_ahora:
-            if not check_neo4j_status():
-                st.error("Sin conexion a BD.")
-                st.session_state.ejecutar_ahora = False
+        # 3. EJECUCIÓN Y LOGS
+        if st.session_state.executing_action:
+            action = st.session_state.executing_action
+            
+            # Mapeo de argumentos
+            args_map = {
+                "reset": ["--reset"],
+                "update": ["--update"],
+                "clear": ["--clear"]
+            }
+            script_args = args_map.get(action, [])
+            
+            # Verificación de conexión (solo para reset/update que requieren DB)
+            if action in ["reset", "update"] and not check_neo4j_status():
+                st.error("Sin conexión a BD. Inicia Docker en la pestaña Sistema.")
+                st.session_state.executing_action = None
             else:
-                with st.status("Ejecutando ingesta completa...", expanded=True) as status:
-                    st.write("Iniciando script con flag --reset...")
+                label_map = {
+                    "reset": "Ejecutando Reset Completo...",
+                    "update": "Ejecutando Actualización Incremental...",
+                    "clear": "Limpiando Registros..."
+                }
+                
+                with st.status(label_map.get(action, "Procesando..."), expanded=True) as status:
                     
                     # Contenedor vacío para los logs (ancho completo por defecto)
                     log_placeholder = st.empty()
                     full_log = ""
                     
                     # Llamada a la función de streaming corregida (run_ingestion_stream)
-                    for line in run_ingestion_stream(["--reset"]):
+                    for line in run_ingestion_stream(script_args):
                         full_log += line
                         # Actualizamos el cuadro de texto
                         log_placeholder.code(full_log, language="bash")
@@ -267,11 +314,15 @@ def main():
                         )
                     
                     status.update(label="Proceso Completado", state="complete", expanded=False)
-                    st.success("Ingesta finalizada correctamente.")
-                    st.cache_resource.clear() 
-                    st.session_state.ejecutar_ahora = False # Reset para permitir nuevas ejecuciones
                     
-                    if st.button("Limpiar Pantalla"):
+                    if action in ["reset", "update"]:
+                        st.cache_resource.clear()
+                        st.success("Base de conocimientos actualizada. Cache limpiado.")
+                    else:
+                        st.success("Operación finalizada.")
+                    
+                    st.session_state.executing_action = None
+                    if st.button("Cerrar Logs"):
                         st.rerun()
 
     # --- PESTANA 1: CHAT ---
