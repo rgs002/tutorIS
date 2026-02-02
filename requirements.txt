@@ -179,7 +179,6 @@ tornado==6.5.4
 tqdm==4.67.1
 transformers==4.57.3
 triton==3.5.1
--e git+https://github.com/rgs002/tutorIS@0c83aef1cbaedc8c3ccd1946f699d53cb6d2f284#egg=tutoris
 typer==0.20.0
 types-PyYAML==6.0.12.20250915
 typing-inspect==0.9.0

@@ -5,6 +5,7 @@ import shutil
 import json
 from datetime import datetime
 import concurrent.futures
+from difflib import SequenceMatcher
 
 # Integración de Embeddings y VectorDB
 from ingestion.embeddings import EmbeddingFactory
@@ -159,10 +160,15 @@ def process_chunk_graph(args):
             
             # --- TRAZABILIDAD DE FUENTES ---
             if mini_graph:
+                asignatura = chunk.metadata.get("asignatura", "general")
                 doc_node = Node(
                     id=filename, 
                     type="Documento", 
-                    properties={"path": file_rel_path, "definition": "Archivo fuente del proyecto"}
+                    properties={
+                        "path": file_rel_path, 
+                        "definition": "Archivo fuente del proyecto",
+                        "asignatura": asignatura
+                    }
                 )
                 
                 for doc in mini_graph:
@@ -172,6 +178,18 @@ def process_chunk_graph(args):
                         node.properties["source_file"] = filename
                         rel = Relationship(source=node, target=doc_node, type="MENCIONADO_EN")
                         doc.relationships.append(rel)
+                
+                # [FIX] Forzar actualización de propiedades del Documento (para corregir Ruta: None)
+                cypher_doc = """
+                MERGE (d:Documento {id: $id})
+                SET d.path = $path, d.definition = $definition, d.asignatura = $asignatura
+                """
+                graph_db_manager.graph.query(cypher_doc, {
+                    "id": filename,
+                    "path": file_rel_path,
+                    "definition": "Archivo fuente del proyecto",
+                    "asignatura": asignatura
+                })
 
             # --- NORMALIZACIÓN Y ENRIQUECIMIENTO ---
             if mini_graph:
@@ -204,23 +222,51 @@ def process_chunk_graph(args):
                         embedding = embedding_model.embed_query(text_rep)
                         node.properties["embedding"] = embedding
 
+                        # --- DEDUPLICACIÓN DE DEFINICIONES ---
+                        should_append = True
+                        if new_def:
+                            try:
+                                # Consultamos definiciones existentes para evitar redundancia
+                                existing_res = graph_db_manager.graph.query(
+                                    f"MATCH (n:`{node.type}` {{id: $id}}) RETURN n.definition AS def",
+                                    {"id": node.id}
+                                )
+                                if existing_res and existing_res[0]['def']:
+                                    for d in existing_res[0]['def'].split("|"):
+                                        if SequenceMatcher(None, new_def, d.strip()).ratio() > 0.85:
+                                            should_append = False
+                                            break
+                            except Exception:
+                                pass
+
                         if new_def:
                             cypher_merge = f"""
                             MERGE (n:`{node.type}` {{id: $id}})
-                            ON CREATE SET n.definition = $new_def, n.embedding = $embedding
+                            ON CREATE SET 
+                                n.definition = $new_def, 
+                                n.embedding = $embedding,
+                                n.asignatura = $asignatura
                             ON MATCH SET 
                                 n.embedding = $embedding,
                                 n.definition = 
                                 CASE 
                                     WHEN n.definition IS NULL OR n.definition = "" THEN $new_def
-                                    WHEN NOT n.definition CONTAINS $new_def THEN n.definition + " | " + $new_def
+                                    WHEN $should_append AND NOT n.definition CONTAINS $new_def THEN n.definition + " | " + $new_def
                                     ELSE n.definition
+                                END,
+                                n.asignatura = 
+                                CASE
+                                    WHEN n.asignatura IS NULL OR n.asignatura = "" THEN $asignatura
+                                    WHEN NOT n.asignatura CONTAINS $asignatura THEN n.asignatura + ", " + $asignatura
+                                    ELSE n.asignatura
                                 END
                             """
                             graph_db_manager.graph.query(cypher_merge, {
                                 "id": node.id, 
                                 "new_def": new_def, 
-                                "embedding": embedding
+                                "embedding": embedding,
+                                "asignatura": asignatura,
+                                "should_append": should_append
                             })
             
             if mini_graph:
@@ -336,6 +382,12 @@ def main():
                 if not chunks:
                     print("  -> [INFO] No se generaron chunks.")
                     continue
+
+                # Detectar asignatura basada en la carpeta raíz dentro de data/raw
+                path_parts = file_rel_path.split(os.sep)
+                asignatura = path_parts[0] if len(path_parts) > 1 else "general"
+                for c in chunks:
+                    c.metadata["asignatura"] = asignatura
 
                 # ---------------- BIFURCACIÓN DEL PROCESO ----------------
                 

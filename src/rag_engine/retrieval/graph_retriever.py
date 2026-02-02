@@ -6,6 +6,9 @@ from ingestion.graph_store import GraphDBManager
 from ingestion.embeddings import EmbeddingFactory
 from rag_engine.retrieval.graph_organizer import GraphOrganizer
 
+# Configuración de depuración: Muestra en consola el contexto crudo enviado al LLM
+DEBUG_SHOW_GRAPH_CONTEXT = True
+
 class GraphRetriever:
     """
     Recuperador de grafos blindado contra:
@@ -86,7 +89,7 @@ class GraphRetriever:
 
                 for row in result:
                     print(f"     -> Candidato: '{row['name']}' (Score: {row['score']:.4f})")
-                    if row['score'] > 0.30:
+                    if row['score'] > 0.40:
                         anchors.append(row)
                     else:
                         print("        -> [DESCARTADO] Score bajo (< 0.30)")
@@ -101,7 +104,8 @@ class GraphRetriever:
 
     def _traverse_graph(self, anchor_names: list[str]):
         """
-        Navega el grafo desde los nodos ancla para descubrir relaciones (1-2 saltos).
+        Navega el grafo desde los nodos ancla para descubrir relaciones semánticas (1-2 saltos).
+        EXCLUYE relaciones estructurales como 'MENCIONADO_EN' para evitar ruido de documentos (Supernodos).
         """
         if not anchor_names:
             return []
@@ -109,14 +113,25 @@ class GraphRetriever:
         # Consulta para expandir el vecindario (Traversal)
         cypher = """
         MATCH (n) WHERE n.id IN $anchor_names
-        MATCH path = (n)-[*1..2]-(m)
+        MATCH path = (n)-[:USA|GENERA|IMPLEMENTA|COMPONE|REQUISITO_PARA|ASOCIADO_A*1..2]-(m)
         WHERE n <> m
         WITH path LIMIT 100
         UNWIND relationships(path) AS r
         RETURN DISTINCT 
-            {id: startNode(r).id, label: head(labels(startNode(r)))} AS source,
+            {
+                id: startNode(r).id, 
+                label: head(labels(startNode(r))),
+                definition: startNode(r).definition,
+                asignatura: startNode(r).asignatura
+            } AS source,
             type(r) AS type,
-            {id: endNode(r).id, label: head(labels(endNode(r))), definition: endNode(r).definition, embedding: endNode(r).embedding} AS target
+            {
+                id: endNode(r).id, 
+                label: head(labels(endNode(r))), 
+                definition: endNode(r).definition, 
+                asignatura: endNode(r).asignatura,
+                embedding: endNode(r).embedding
+            } AS target
         """
         try:
             return self.graph.query(cypher, {"anchor_names": anchor_names})
@@ -157,6 +172,17 @@ class GraphRetriever:
             anchor_names = [a['name'] for a in anchors]
             print(f"  -> [GRAFO] Anclas encontradas: {len(anchors)}")
 
+            # 1.1 PREPARAR CONTEXTO DE ANCLAS (Definiciones directas)
+            # Garantiza que el LLM tenga las definiciones de los términos encontrados,
+            # independientemente de si existen relaciones semánticas.
+            anchors_context_lines = ["DEFINICIONES DE CONCEPTOS CLAVE (ANCLAS):"]
+            for a in anchors:
+                name = a.get('name', 'N/A')
+                label = (a.get('labels') or ['Concepto'])[0]
+                definition = a.get('definition', 'Sin definición disponible.')
+                anchors_context_lines.append(f"- {name} ({label}): {definition}")
+            anchors_block = "\n".join(anchors_context_lines)
+
             # 2. NAVEGACIÓN (Traversal) - Obtenemos tripletas crudas
             raw_triplets = self._traverse_graph(anchor_names)
 
@@ -169,7 +195,17 @@ class GraphRetriever:
             # 3. ORGANIZACIÓN (Poda + Verbalización)
             # Procesamos las tripletas para obtener un texto fluido y relevante
             graph_context = self.organizer.process_subgraph(user_query, raw_triplets)
-            full_context = f"{graph_context}"
+            full_context = f"{anchors_block}\n\nRELACIONES SEMÁNTICAS:\n{graph_context}"
+
+            if DEBUG_SHOW_GRAPH_CONTEXT:
+                print("\n" + "="*60)
+                print("CONTEXTO RECUPERADO DEL GRAFO (RAW INPUT TO LLM)")
+                print("="*60)
+                print(full_context)
+                print("-" * 60)
+                print("FUENTES:")
+                print(sources_str)
+                print("="*60 + "\n")
 
             # 4. GENERACIÓN
             chain = self.qa_prompt | self.llm | StrOutputParser()
