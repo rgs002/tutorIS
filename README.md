@@ -117,7 +117,9 @@ streamlit run src/frontend_app.py
 Desde la aplicación, podrá realizar las siguientes operaciones de forma simplificada:
 
 * **Control de Infraestructura:** Verificación del estado de los contenedores Docker y conectividad con Neo4j/ChromaDB. Si el sistema detecta que los servicios no están operativos, aparecerá un botón en la pantalla para arrancarlos.
-* **Ingesta de Datos:** En lugar de ejecutar `ingest.py` manualmente, el panel incluye un botón de **Procesar Material Docente**. Al pulsarlo, el sistema leerá los PDFs de la carpeta `data/`, generará los fragmentos, embeddings y relaciones en el grafo de forma automática. Este proceso tardará unos minutos.
+* **Ingesta de Datos:** En lugar de ejecutar `ingest.py` manualmente, el panel incluye un botón de **Procesar Material Docente**. Al pulsarlo, el sistema leerá los PDFs de la carpeta `data/raw`, generará los fragmentos, embeddings y relaciones en el grafo de forma automática. Este proceso tardará unos minutos.
+
+Nota: Es imprescindible crear el directorio /data/raw y que los subdirectorios que se guarden en este tengan los nombres de las asignaturas a los que pertenecen.
 
 ---
 
