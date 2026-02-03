@@ -1,4 +1,4 @@
-# TutorIS: Asistente Educativo basado en RAG y Grafos de Conocimiento
+# TutorIS: Asistente Educativo especialista en asignaturas de Ingeniería del Software del grado de Ingeniería Informática, Universidad de Cantabria
 
 TutorIS es un sistema de tutoría inteligente diseñado para el apoyo docente en asignaturas de Ingeniería del Software. La arquitectura emplea una estrategia de generación aumentada por recuperación (RAG) híbrida, integrando una base de datos vectorial (ChromaDB) y un grafo de conocimiento (Neo4j).
 
