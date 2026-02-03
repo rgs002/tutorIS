@@ -45,7 +45,7 @@ pip install -r requirements.txt
 
 ```bash
 # Instalar Git y la versión específica de Python 3.11
-sudo pacman -S git python311
+pamac build python311
 
 # Clonar el repositorio
 git clone https://github.com/rgs002/tutorIS.git
