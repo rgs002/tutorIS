@@ -18,7 +18,7 @@ TutorIS es un sistema de tutoría inteligente diseñado para el apoyo docente en
 Clone el repositorio y configure el entorno virtual:
 
 ```bash
-git clone https://github.com/usuario/tutorIS.git
+git clone https://github.com/rgs002/tutorIS
 cd tutorIS
 python -m venv venv
 source venv/bin/activate  # En Windows: venv\Scripts\activate
