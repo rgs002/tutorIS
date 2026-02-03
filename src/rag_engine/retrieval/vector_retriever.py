@@ -18,8 +18,8 @@ class VectorRetriever:
         """
         Preparamos la conexión a ChromaDB y el modelo de embeddings.
         """
-        self.default_k = int(os.getenv("RETRIEVAL_K", 10))
-        self.top_n = 5
+        self.default_k = int(os.getenv("VECTOR_RETRIEVAL_K", 10))
+        self.top_n = int(os.getenv("RAG_TOP_N", 5))
         self.rerank_model = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
         raw_embeddings = EmbeddingFactory.get_embeddings()
         self.embedding_function = LangchainEmbeddingFunctionWrapper(raw_embeddings)

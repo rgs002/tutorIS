@@ -1,0 +1,15 @@
+¿Cuántas horas debe trabajar cada estudiante por sprint?
+¿Cómo debo nombrar al apk?
+¿Cuál es la diferencia entre requisitos funcionales y no funcionales? Explícamelo con una tabla comparativa.
+¿Cómo se organizan las pruebas unitarias?
+¿Cómo se puede probar un método de una clase que ejecuta en su propio thread sin usar Thread.Sleep?
+En pruebas con Espresso ¿cómo se puede acceder a un SearchView que se encuentra dentro de un Toolbar, de los que usan el icono de lupa?
+¿Cómo se tiene que denominar el plan de calidad de un Sprint?
+¿Cuál es la versión exacta de la plataforma Jakarta EE que se utiliza en el curso?
+¿Qué puerto utiliza por defecto la consola de administración de Glassfish?
+¿Qué anotación se utiliza en JPA para indicar que un atributo no debe ser persistido en la base de datos?
+¿Cuál es el nombre del plugin de Maven recomendado para desplegar aplicaciones en Glassfish?
+¿Dónde puedo encontrar las reglas a aplicar para la nomenclatura de las clases de prueba?
+Explicame la relevancia del testInstrumentationRunner en la configuración de pruebas para Android y cómo coordina la ejecución en dispositivos reales.
+¿Puede haber valores anómalos en las fechas proporcionadas dentro del servicio de datos?
+¿Hay que tratar casos de valores anómalos en las fechas para los criterios de confirmación?
