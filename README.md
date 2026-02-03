@@ -1,7 +1,3 @@
-Aquí tienes el archivo `README.md` actualizado. He integrado las instrucciones específicas para cada sistema operativo y he ajustado el requisito de la versión de Python para evitar el error de incompatibilidad, manteniendo un tono formal, directo y sin emojis, tal como solicitaste.
-
----
-
 # TutorIS: Asistente Educativo basado en RAG y Grafos de Conocimiento
 
 TutorIS es un sistema de tutoría inteligente diseñado para el apoyo docente en asignaturas de Ingeniería del Software. La arquitectura emplea una estrategia de generación aumentada por recuperación (RAG) híbrida, integrando una base de datos vectorial (ChromaDB) y un grafo de conocimiento (Neo4j).
