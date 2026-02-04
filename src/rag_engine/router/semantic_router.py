@@ -27,7 +27,6 @@ class SemanticRouter:
             Úsalo para preguntas directas que se responden con un hecho puntual, un nombre o una descripción técnica, incluso si es sobre el curso.
             Ejemplos:
             - "¿Qué es un diagrama de casos de uso?"
-            - "¿Cómo debo nombrar el archivo APK?"
             - "¿Qué versión de Jakarta EE se utiliza?"
             - "¿Cuál es la diferencia teórica entre agregación y composición?"
 
