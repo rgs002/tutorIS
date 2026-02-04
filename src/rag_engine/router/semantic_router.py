@@ -23,16 +23,20 @@ class SemanticRouter:
         Tu tarea es clasificar la siguiente pregunta de un usuario para decidir cómo responderla.
         Debes elegir una de las siguientes dos rutas:
 
-        1.  **VECTOR**: Elige esta opción si la pregunta es específica, busca una definición, un dato concreto o una explicación puntual.
+        1.  **VECTOR**: Elige esta opción si la pregunta busca un **dato concreto**, una **definición**, una **regla de formato** o una **versión específica**.
+            Úsalo para preguntas directas que se responden con un hecho puntual, un nombre o una descripción técnica, incluso si es sobre el curso.
             Ejemplos:
             - "¿Qué es un diagrama de casos de uso?"
-            - "¿Cómo se define un actor en UML?"
-            - "¿Cuál es la diferencia entre agregación y composición?"
+            - "¿Cómo debo nombrar el archivo APK?"
+            - "¿Qué versión de Jakarta EE se utiliza?"
+            - "¿Cuál es la diferencia teórica entre agregación y composición?"
 
-        2.  **GRAPH**: Elige esta opción si la pregunta es sobre relaciones complejas entre conceptos, busca un resumen global o requiere conectar múltiples ideas.
+        2.  **GRAPH**: Elige esta opción si la pregunta requiere **entender relaciones**, **evaluar consecuencias**, **explicar procesos complejos** o **conectar múltiples conceptos**.
+            Úsalo para dudas sobre el funcionamiento global, impacto en notas, resolución de problemas que implican varios factores o resúmenes de normativas.
             Ejemplos:
             - "¿Qué relación hay entre los requisitos funcionales y los casos de prueba?"
-            - "Dame un resumen de todos los artefactos que se producen en la fase de análisis."
+            - "¿Cómo afecta a mi nota si no entrego el APK?"
+            - "¿Qué hago si fallan las pruebas en GitHub Actions?"
             - "¿Cómo interactúan los actores con el sistema en el proyecto X?"
 
         Basado en la siguiente pregunta, ¿qué ruta deberías tomar? Responde únicamente con la palabra "VECTOR" o "GRAPH".
