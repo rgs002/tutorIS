@@ -25,6 +25,10 @@ class GraphRetriever:
         self.embedding_model = EmbeddingFactory.get_embeddings()
         self.organizer = GraphOrganizer()
 
+        # Configuración de recuperación desde variables de entorno
+        self.retrieval_k = int(os.getenv("GRAPH_RETRIEVAL_K", 5))
+        self.traversal_depth = int(os.getenv("GRAPH_TRAVERSAL_DEPTH", 2))
+
         self.llm = ChatGoogleGenerativeAI(
             model="gemini-2.0-flash",
             temperature=0,
@@ -61,10 +65,13 @@ class GraphRetriever:
             template=qa_generation_template
         )
 
-    def _get_anchors(self, query: str, k=5):
+    def _get_anchors(self, query: str, k=None):
         """
         Realiza una búsqueda vectorial en Neo4j para encontrar los nodos más relevantes (Anclas).
         """
+        if k is None:
+            k = self.retrieval_k
+
         try:
             print(f"  -> [DEBUG] Generando embedding para: '{query}'")
             embedding = self.embedding_model.embed_query(query)
@@ -111,9 +118,9 @@ class GraphRetriever:
             return []
             
         # Consulta para expandir el vecindario (Traversal)
-        cypher = """
+        cypher = f"""
         MATCH (n) WHERE n.id IN $anchor_names
-        MATCH path = (n)-[:USA|GENERA|IMPLEMENTA|COMPONE|REQUISITO_PARA|ASOCIADO_A*1..2]-(m)
+        MATCH path = (n)-[:USA|GENERA|IMPLEMENTA|COMPONE|REQUISITO_PARA|ASOCIADO_A*1..{self.traversal_depth}]-(m)
         WHERE n <> m
         WITH path LIMIT 100
         UNWIND relationships(path) AS r

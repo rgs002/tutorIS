@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import argparse
 import shutil
@@ -178,18 +179,6 @@ def process_chunk_graph(args):
                         node.properties["source_file"] = filename
                         rel = Relationship(source=node, target=doc_node, type="MENCIONADO_EN")
                         doc.relationships.append(rel)
-                
-                # [FIX] Forzar actualización de propiedades del Documento (para corregir Ruta: None)
-                cypher_doc = """
-                MERGE (d:Documento {id: $id})
-                SET d.path = $path, d.definition = $definition, d.asignatura = $asignatura
-                """
-                graph_db_manager.graph.query(cypher_doc, {
-                    "id": filename,
-                    "path": file_rel_path,
-                    "definition": "Archivo fuente del proyecto",
-                    "asignatura": asignatura
-                })
 
             # --- NORMALIZACIÓN Y ENRIQUECIMIENTO ---
             if mini_graph:
@@ -279,6 +268,11 @@ def process_chunk_graph(args):
             if "429" in error_msg or "RESOURCE_EXHAUSTED" in error_msg:
                 wait_time = 30 * (attempt + 1)
                 print(f"     [RATE LIMIT] Pausando {wait_time}s antes de reintentar chunk {i+1}/{total_chunks}...")
+                time.sleep(wait_time)
+                attempt += 1
+            elif "DeadlockDetected" in error_msg or "TransientError" in error_msg or "lock" in error_msg.lower():
+                # [RACE CONDITION] Si hay bloqueo en DB, esperamos un poco y reintentamos silenciosamente
+                wait_time = 1 * (attempt + 1)
                 time.sleep(wait_time)
                 attempt += 1
             else:
@@ -396,16 +390,44 @@ def main():
                 print(f"  -> [VECTOR] {len(chunks)} chunks guardados en ChromaDB.")
 
                 # RUTA B: Grafo (Con gestión de Rate Limits y Reintentos)
-                print(f"  -> [GRAFO] Analizando {len(chunks)} chunks en paralelo (Workers: 4)...")
+                WORKERS = 4
+                print(f"  -> [GRAFO] Analizando {len(chunks)} chunks en paralelo (Workers: {WORKERS})...")
+                
+                # [OPTIMIZACIÓN] Pre-crear el nodo Documento una sola vez para evitar Deadlocks
+                # por contención cuando varios hilos intentan escribir en él simultáneamente.
+                try:
+                    graph_db_manager.graph.query("""
+                        MERGE (d:Documento {id: $id})
+                        SET d.path = $path, d.definition = $definition, d.asignatura = $asignatura
+                    """, {
+                        "id": filename,
+                        "path": file_rel_path,
+                        "definition": "Archivo fuente del proyecto",
+                        "asignatura": asignatura
+                    })
+                except Exception as e:
+                    print(f"  -> [WARN] Error pre-creando nodo documento: {e}")
                 
                 chunk_args = [
                     (chunk, i, len(chunks), llm_transformer, graph_db_manager, embedding_model, filename, file_rel_path)
                     for i, chunk in enumerate(chunks)
                 ]
 
-                with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
-                    results = list(executor.map(process_chunk_graph, chunk_args))
-                
+                with concurrent.futures.ThreadPoolExecutor(max_workers=WORKERS) as executor:
+                    # Usamos submit + as_completed para actualizar la barra en tiempo real (sin esperar orden)
+                    futures = [executor.submit(process_chunk_graph, arg) for arg in chunk_args]
+                    results = []
+                    total = len(chunks)
+                    for i, future in enumerate(concurrent.futures.as_completed(futures)):
+                        results.append(future.result())
+                        
+                        processed = i + 1
+                        if sys.stdout.isatty():
+                            print(f"\r     Progreso: {processed}/{total} chunks procesados...", end="", flush=True)
+                        elif processed % max(1, int(total * 0.1)) == 0 or processed == total:
+                            print(f"     Progreso: {int(processed/total * 100)}% ({processed}/{total} chunks)...")
+                if sys.stdout.isatty():
+                    print("")
                 chunks_with_graph = sum(results)
 
                 print(f"  -> [GRAFO] Procesamiento completado. {chunks_with_graph}/{len(chunks)} chunks generaron grafos.")

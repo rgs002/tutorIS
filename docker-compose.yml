@@ -1,4 +1,7 @@
+version: '3.8'
+
 services:
+  
   neo4j:
     image: neo4j:5.18.0
     container_name: tutoris_graph_db
@@ -6,11 +9,10 @@ services:
       - "7474:7474" # HTTP (Browser)
       - "7687:7687" # Bolt (Conexión Python)
     volumes:
-      # Guardamos los datos en carpeta local 'data'
+      # Guardamos los datos de Neo4j específicamente aquí
       - ./data/neo4j_data:/data
     environment:
       - NEO4J_AUTH=${NEO4J_USERNAME:-neo4j}/${NEO4J_PASSWORD:-password123}
-      # Habilitamos APOC para futuras limpiezas de nodos duplicados
       - NEO4J_PLUGINS=["apoc"]
       - NEO4J_dbms_security_procedures_unrestricted=apoc.*
     healthcheck:
@@ -18,3 +20,22 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  # Nuevo servicio para el Frontend y Motor RAG
+  tutoris_app:
+    build: .
+    container_name: tutoris_app_frontend
+    ports:
+      - "8501:8501" # Puerto de Streamlit
+    volumes:
+      # Montamos la carpeta data para que la app lea los PDFs (data/raw) y la base de datos ChromaDB
+      - ./data:/app/data
+    env_file:
+      - .env # Carga tu API Key de Google y configuración general
+    environment:
+      # IMPORTANTE: Sobrescribimos la URI para la red interna de Docker
+      - NEO4J_URI=bolt://neo4j:7687 
+    depends_on:
+      neo4j:
+        # La app solo arrancará cuando el healthcheck de Neo4j esté en verde
+        condition: service_healthy

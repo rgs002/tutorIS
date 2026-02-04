@@ -1,0 +1,94 @@
+question,response,time_sec,route,relevant,supported,useful
+¿Cuántas horas debe trabajar cada estudiante por sprint?,"Según la información proporcionada, cada alumno debe dedicar **36 horas de trabajo efectivo** por sprint.
+
+Este cálculo se obtiene de la siguiente manera:
+1.  La carga de trabajo total por sprint es de **40 horas** por persona (20 horas por semana durante dos semanas).
+2.  A estas 40 horas se les descuentan **4 horas** dedicadas a las reuniones de Scrum (*Sprint Planning*, *Product Backlog Refinement*, *Sprint Review* y *Sprint Retrospective*).
+
+Además, se debe tener en cuenta que si hay días festivos durante el sprint, la carga de trabajo se reducirá en un 10% por cada día festivo.",25.38,VECTOR,True,True,True
+¿Cómo debo nombrar al apk?,"Basándote en la información del contexto, cada fichero `apk` generado al final de un *sprint* debe nombrarse siguiendo este patrón:
+
+`<AppName>-<XX.YY.ZZ>.yy-mm-dd.apk`
+
+Donde:
+*   **`AppName`**: Es el nombre de la aplicación que has desarrollado.
+*   **`XX.YY.ZZ`**: Es el número de versión, de acuerdo con el esquema de versionado del proyecto.
+*   **`yy-mm-dd`**: Es la fecha de generación del fichero.",25.4,VECTOR,True,True,True
+¿Cuál es la diferencia entre requisitos funcionales y no funcionales? Explícamelo con una tabla comparativa.,"Hola, soy TutorIS.
+
+Basándome en la información de contexto proporcionada, no es posible elaborar una tabla comparativa completa que explique la diferencia entre requisitos funcionales y no funcionales.
+
+El contexto (T01) introduce el tema y señala que los ""principales rasgos diferenciadores"" se analizan en una lectura específica: la **Sección 4.1 del libro ""Software Engineering"" (9ª Edición) de Ian Sommerville**. El texto no contiene la explicación en sí misma, sino que te dirige a la fuente donde puedes encontrarla.
+
+Adicionalmente, el documento T02 indica que uno de los objetivos de aprendizaje es ""comprender y saber utilizar correctamente el concepto de requisito no funcional"", y da un ejemplo de esta categoría al hablar de ""requisitos no funcionales relacionados con la seguridad"".
+
+Para obtener la explicación detallada y poder construir la tabla que solicitas, te recomiendo consultar la lectura indicada en el texto T01.",34.82,VECTOR,True,True,True
+¿Cómo se organizan las pruebas unitarias?,"Basándome en el contexto proporcionado, las pruebas unitarias se organizan siguiendo un **Plan de Pruebas Unitarias** que consta de dos fases principales:
+
+1.  **Definición de pruebas:** En esta fase se determinan los casos de prueba que se van a utilizar. Para ello, se emplean técnicas como:
+    *   **Caja Negra:** Se definen pruebas sin conocer el código interno (partición equivalente, análisis de valores límite, conjetura de errores, etc.).
+    *   **Caja Blanca:** Se diseñan pruebas conociendo el código fuente para asegurar la cobertura de sentencias, decisiones, caminos, etc.
+
+2.  **Ejecución de pruebas:** Una vez definidos los casos, se procede a su ejecución. Estas pruebas:
+    *   Son llevadas a cabo por los propios programadores.
+    *   Se realizan con acceso al código fuente y con la ayuda de herramientas de depuración.
+    *   Utilizan frameworks como **JUnit** y, si es necesario para mantener el aislamiento de las clases, librerías como **Mockito**.
+
+El objetivo principal de esta organización es verificar el funcionamiento **aislado** de piezas individuales de software, como métodos o clases.",33.08,VECTOR,True,True,True
+¿Cómo se puede probar un método de una clase que ejecuta en su propio thread sin usar Thread.Sleep?,"Basándome en el contexto proporcionado, no es posible responder a tu pregunta. El texto habla sobre conceptos de testing como Mockito, pruebas de UI en Android y despliegues con Arquillian, pero no aborda específicamente la problemática de probar código multihilo o asíncrono.
+
+No obstante, como TutorIS, experto en Ingeniería de Software, puedo darte una respuesta completa y detallada, ya que es una pregunta muy importante en el testing de software.
+
+Usar `Thread.sleep()` en las pruebas es una mala práctica por dos razones principales:
+
+1.  **Fragilidad (Flakiness):** La prueba puede fallar en una máquina más lenta o bajo carga, ya que el tiempo de espera fijo podría no ser suficiente. Esto hace que las pruebas no sean determinísticas.
+2.  **Lentitud:** Obliga a la suite de pruebas a esperar un tiempo predefinido, incluso si la operación termina mucho antes, ralentizando todo el proceso de CI/",43.62,VECTOR,True,False,True
+"En pruebas con Espresso ¿cómo se puede acceder a un SearchView que se encuentra dentro de un Toolbar, de los que usan el icono de lupa?","Basándome en el contexto proporcionado, no se especifica el método exacto para acceder a un `SearchView` que se encuentra dentro de un `Toolbar`.
+
+El contexto ofrece algunas sentencias útiles para Espresso, como abrir el menú de opciones (`openActionBarOverflowOrOptionsMenu`) o acceder a elementos en un `ListView` (`onData`), pero no incluye un ejemplo para interactuar con un `SearchView` identificado por su icono de lupa.",27.55,VECTOR,True,True,True
+¿Cómo se tiene que denominar el plan de calidad de un Sprint?,"Según el contexto proporcionado, el plan se denomina **Plan de acción**.
+
+Este plan es el resultado principal del análisis de calidad que se realiza en cada Sprint y se incluye dentro del **informe de calidad**. Su objetivo es detallar las incidencias concretas que se van a solucionar antes de que finalice el Sprint.",26.11,VECTOR,True,True,True
+¿Cuál es la versión exacta de la plataforma Jakarta EE que se utiliza en el curso?,"Según la información proporcionada, la versión exacta de la plataforma Jakarta EE que se utiliza en la asignatura es **Jakarta EE 9.1**.
+
+El contexto indica: ""En la asignatura usaremos Jakarta EE 9.1"".",25.51,VECTOR,True,True,True
+¿Qué puerto utiliza por defecto la consola de administración de Glassfish?,"Según la información proporcionada, el puerto que utiliza por defecto la consola de administración de Glassfish es el **4848**.
+
+El contexto lo menciona explícitamente:
+*   ""Puerto 4848 para Administración""
+*   ""Para comprobar que Glassfish se ha instalado correctamente, acceder a la consola de administración en localhost:4848""",23.23,VECTOR,True,True,True
+¿Qué anotación se utiliza en JPA para indicar que un atributo no debe ser persistido en la base de datos?,"Según el contexto proporcionado, la anotación que se utiliza para indicar que un atributo o propiedad no debe ser persistido en la base de datos es **`@Transient`**.
+
+Esta anotación es opcional y su función es indicar que el atributo/propiedad no se hace persistente.",26.11,VECTOR,True,True,True
+¿Cuál es el nombre del plugin de Maven recomendado para desplegar aplicaciones en Glassfish?,"Basándome en la información proporcionada, el nombre del plugin de Maven recomendado para desplegar aplicaciones en Glassfish es **maven-glassfish-plugin**.",26.01,VECTOR,True,True,True
+¿Dónde puedo encontrar las reglas a aplicar para la nomenclatura de las clases de prueba?,"Según la información proporcionada, puedes encontrar las reglas para la nomenclatura de las clases de prueba en el apartado **""Nomenclatura y organización de las clases de prueba""**.
+
+Las reglas específicas son:
+
+*   **Para pruebas unitarias:**
+    *   Se almacenan en el directorio `test`.
+    *   Se nombran siguiendo el formato `<NombreClase>Test.java`, donde `<NombreClase>` es el nombre de la clase que se está probando.
+    *   Se definen en un paquete con el mismo nombre que el paquete de la clase bajo prueba.
+
+*   **Para pruebas de integración:**
+    *   Se almacenan en el directorio `test`.
+    *   Se nombran siguiendo el formato `<NombreClase>ITest.java`, donde `<NombreClase>` es el nombre de la clase principal que se está probando.",27.66,VECTOR,True,True,True
+Explicame la relevancia del testInstrumentationRunner en la configuración de pruebas para Android y cómo coordina la ejecución en dispositivos reales.,"Basándome en el contexto proporcionado, no se menciona explícitamente el `testInstrumentationRunner`.
+
+Sin embargo, el contexto sí explica dónde se organizan las pruebas que se ejecutan en dispositivos reales o emulados:
+
+*   **Directorio `androidTest`**: Este es el lugar destinado para las pruebas que requieren un entorno Android completo, como los tests de interfaz gráfica.
+*   **Ejecución**: Se especifica claramente que las pruebas ubicadas en este directorio **requieren dispositivos reales o emulados para su ejecución**.
+*   **Configuración**: Las dependencias para este tipo de pruebas se configuran en el fichero `build.gradle` utilizando `androidTestImplementation`.
+
+En resumen, aunque el contexto no detalla el rol del `testInstrumentationRunner`, sí establece que las pruebas instrumentadas (las que corren en un dispositivo) se encuentran en el directorio `androidTest` y son distintas de las pruebas unitarias del directorio `test`, que se ejecutan en el equipo de desarrollo.",34.49,VECTOR,True,True,True
+¿Puede haber valores anómalos en las fechas proporcionadas dentro del servicio de datos?,"Sí, según la información proporcionada, se contempla la existencia de valores anómalos en las fechas.
+
+El contexto indica explícitamente que existen ""criterios de confirmación consensuados con el *Product Owner* para tratar situaciones que puedan considerarse anómalas, como **la ausencia de fecha en ciertos elementos de una colección** a la hora de ordenar dicha colección por fecha"".
+
+Esto confirma que se ha previsto la posibilidad de que algunos elementos no tengan fecha y se ha definido un procedimiento para manejar esa anomalía.",29.18,VECTOR,True,True,True
+¿Hay que tratar casos de valores anómalos en las fechas para los criterios de confirmación?,"Sí. Basado en la información proporcionada, se deben tratar los casos de valores anómalos en las fechas.
+
+Específicamente, el contexto menciona que: ""Existen criterios de confirmación consensuados con el *Product Owner* para tratar situaciones que puedan considerarse anómalas, como la **ausencia de fecha** en ciertos elementos de una colección a la hora de ordenar dicha colección por fecha.""
+
+Por lo tanto, se debe definir cómo actuar ante la ausencia de una fecha al realizar una ordenación.",31.54,VECTOR,True,True,True

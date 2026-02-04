@@ -1,0 +1,129 @@
+question,response,time_sec,route,relevant,supported,useful
+¿Cuántas horas debe trabajar cada estudiante por sprint?,"Según la información proporcionada, la carga de trabajo para un estudiante estándar por sprint es de **40 horas**.
+
+Este cálculo se basa en:
+*   Una carga de trabajo de **20 horas por semana**.
+*   Una duración de los sprints de **dos semanas**.
+
+A estas 40 horas hay que descontarles cuatro horas. Además, si hay días festivos durante el sprint, se debe restar un 10% de la capacidad por cada día festivo.",29.09,VECTOR,True,True,True
+¿Cómo debo nombrar al apk?,"Basándome en el contexto proporcionado, no puedo darte una respuesta sobre cómo nombrar un archivo APK.
+
+La información se centra en la descripción y nomenclatura de **casos de uso** en el ámbito de la ingeniería de software. Menciona elementos como el identificador, el nombre del caso de uso, los actores y el objetivo, pero no aborda las convenciones de nomenclatura para archivos de paquetes de aplicaciones (APK).",32.56,VECTOR,True,True,True
+¿Cuál es la diferencia entre requisitos funcionales y no funcionales? Explícamelo con una tabla comparativa.,"Claro, aquí tienes la explicación sobre la diferencia entre requisitos funcionales y no funcionales, basada en el contexto proporcionado y presentada en una tabla comparativa.
+
+---
+
+La principal diferencia entre los requisitos funcionales y los no funcionales es que los **requisitos funcionales** describen **qué** hace el sistema (sus funciones), mientras que los **requisitos no funcionales** describen **cómo** el sistema realiza esas funciones (sus cualidades y restricciones).
+
+El contexto indica que los requisitos de calidad (un tipo de requisito no funcional) deben mantenerse y documentarse por separado de los requisitos funcionales, aunque a menudo están relacionados con ellos.
+
+Aquí tienes una tabla comparativa para ilustrar mejor estas diferencias:
+
+| Característica | Requisitos Funcionales | Requisitos No Funcionales |
+| :--- | :--- | :--- |
+| **Enfoque** | Describen las **funciones** que el sistema debe proporcionar para satisfacer las necesidades del usuario. Responden a la pregunta: **""¿Qué hace el sistema?""** | Describen las **cualidades** del sistema y las **restricciones** bajo las cuales debe operar. Responden a la pregunta: **""¿Cómo funciona el sistema?""** |
+| **Definición según el contexto** | Se centran en la ""adecuación funcional"": el grado en que un sistema proporciona funciones que satisfacen las necesidades declaradas e implícitas. | Se describen como requisitos de calidad y restricciones asociadas al sistema. |
+| **Sub-características** | **- Completitud funcional:** Si el conjunto de funciones cubre todas las tareas y objetivos. <br> **- Corrección funcional:** Si el sistema proporciona resultados correctos y con la precisión necesaria",45.98,VECTOR,False,False,False
+¿Cómo se organizan las pruebas unitarias?,"Basándome en el contexto proporcionado, las pruebas unitarias se organizan a través de un **Plan de Pruebas Unitarias**, que forma parte de un proceso más amplio de Verificación y Validación (V&V).
+
+Este plan implica un proceso que incluye:
+
+1.  **Definición de pruebas**: Se definen los casos de prueba a utilizar. Para ello, se pueden emplear técnicas como:
+    *   **Caja Negra**: Partición equivalente, análisis de valores límite (AVL), conjetura de errores, etc.
+    *   **Caja Blanca**: Cobertura de sentencias, decisiones, condiciones, caminos, etc.
+
+2.  **Ejecución de pruebas**: Se ejecutan las pruebas definidas sobre el código.
+
+Además, el contexto indica que estas pruebas:
+*   Verifican el funcionamiento **aislado** de piezas de software (métodos o clases individuales).
+*   Suelen ser llevadas a cabo por los **propios programadores**.
+*   Se realizan con acceso al código fuente y con la ayuda de herramientas como JUnit y librerías como Mockito.",34.2,VECTOR,True,True,True
+¿Cómo se puede probar un método de una clase que ejecuta en su propio thread sin usar Thread.Sleep?,"Basándome en la información de contexto proporcionada, no es posible responder a tu pregunta.
+
+El contexto menciona los siguientes puntos relacionados con las pruebas y la concurrencia:
+*   Se realizan **pruebas unitarias y de integración** utilizando frameworks como JUnit y Mockito.
+*   Se indica que los **EJB (Enterprise JavaBeans) son thread-safe** por naturaleza.
+*   Se menciona el uso de **`TimerService`** para programar tareas temporizadas, que son operaciones asíncronas.
+
+Sin embargo, el texto no ofrece ninguna técnica, estrategia o herramienta específica para sincronizar un hilo de prueba con un hilo de ejecución de la aplicación, que es lo necesario para evitar el uso de `Thread.Sleep`.",35.12,VECTOR,True,True,True
+"En pruebas con Espresso ¿cómo se puede acceder a un SearchView que se encuentra dentro de un Toolbar, de los que usan el icono de lupa?","Basándome en la información del contexto proporcionado, no hay una sentencia específica que explique cómo acceder a un `SearchView` dentro de un `Toolbar`. El contexto ofrece ejemplos para abrir el menú de opciones o interactuar con un `ListView`, pero no para el caso que preguntas.
+
+Sin embargo, como experto en Ingeniería de Software, te puedo orientar sobre el procedimiento habitual en Espresso para realizar esa acción, que generalmente consta de dos pasos:
+
+1.  **Hacer clic en el icono de la lupa** para expandir el `SearchView`. Normalmente, este icono tiene un ID asignado en el fichero de menú XML.
+2.  **Escribir en el campo de texto** que aparece. El `EditText` dentro de un `SearchView` suele tener un ID específico.
+
+Un código de ejemplo para lograr esto sería:
+
+```java
+// 1. Busca la vista con el ID del ítem de menú (la lupa) y haz clic en ella.
+onView(withId(R.id.id_del_icono_de_busqueda)).perform(click());
+
+// 2. Busca el campo de texto (EditText) dentro del SearchView por su clase o ID
+// y escribe el texto deseado. El ID suele ser estándar.
+onView(isAssignableFrom(EditText.class)).perform(typeText(""texto a buscar""), pressImeActionButton());
+```
+
+**Nota:**
+*   `R.id.id_del_icono_de_busqueda` debe ser reemplazado por el ID que le hayas dado a tu ítem de menú de búsqueda en el archivo XML correspondiente.
+*   `isAssignableFrom(EditText.class)` es una forma genérica de encontrar el campo de texto una vez que el `SearchView` está visible.",34.71,VECTOR,True,False,True
+¿Cómo se tiene que denominar el plan de calidad de un Sprint?,"Basándome en el contexto proporcionado, el resultado principal del análisis de calidad de un Sprint se denomina **Plan de acción**.
+
+Este **Plan de acción** es el documento donde se detallan las incidencias concretas que se van a solucionar antes de que finalice el Sprint, debidamente priorizadas y justificadas.",31.23,VECTOR,True,True,True
+¿Cuál es la versión exacta de la plataforma Jakarta EE que se utiliza en el curso?,"Según el contexto proporcionado, la versión de la plataforma que se utiliza es **Jakarta EE 9.1**.
+
+La información se encuentra en el texto que dice ""Jakarta EE 9.1 APIs"".",23.35,VECTOR,True,True,True
+¿Qué puerto utiliza por defecto la consola de administración de Glassfish?,"Según la información proporcionada, el puerto que utiliza por defecto la consola de administración de Glassfish es el **4848**.
+
+En el contexto se indica:
+*   ""Puerto 4848 para Administración""
+*   ""Para comprobar que Glassfish se ha instalado correctamente, acceder a la consola de administración en localhost:4848""",23.76,VECTOR,True,True,True
+¿Qué anotación se utiliza en JPA para indicar que un atributo no debe ser persistido en la base de datos?,"Basado en el contexto proporcionado, la anotación que se utiliza para indicar que un atributo no debe ser persistido es **`@Transient`**.
+
+El contexto menciona esta anotación en los títulos ""**Entidad - Anotaciones @Id y @Transient**"", lo que indica que, junto a `@Id` (que marca el identificador único a persistir), `@Transient` es una anotación relevante para la persistencia de atributos en una entidad.",37.58,VECTOR,True,False,True
+¿Cuál es el nombre del plugin de Maven recomendado para desplegar aplicaciones en Glassfish?,"Basándome en el contexto proporcionado, el nombre del plugin de Maven recomendado para desplegar aplicaciones en Glassfish es **maven-glassfish-plugin**.",24.48,VECTOR,True,True,True
+¿Dónde puedo encontrar las reglas a aplicar para la nomenclatura de las clases de prueba?,"Según el contexto proporcionado, puedes encontrar las reglas para la nomenclatura y organización de las clases de prueba en el apartado **""Nomenclatura y organización de las clases de prueba""**.
+
+Las reglas específicas para las **pruebas unitarias** son:
+
+*   **Nombre del fichero:** Se deben denominar `<NombreClase>Test.java`, donde `<NombreClase>` es el nombre de la clase que se está probando.
+*   **Ubicación:** Se almacenan en el directorio `test`.
+*   **Paquete:** Se definen en un paquete con el mismo nombre que el paquete donde se encuentra la clase bajo prueba.
+
+Para las **pruebas de integración**, el documento indica que se debe seguir la misma estructura lógica descrita en ese mismo apartado.",29.59,VECTOR,True,True,True
+Explicame la relevancia del testInstrumentationRunner en la configuración de pruebas para Android y cómo coordina la ejecución en dispositivos reales.,"La información recuperada no proporciona detalles específicos sobre la relevancia del `testInstrumentationRunner` en la configuración de pruebas para Android ni cómo coordina la ejecución en dispositivos reales. Sin embargo, basándome en mi conocimiento general de Ingeniería del Software y pruebas en Android, puedo ofrecerte una explicación:
+
+El `testInstrumentationRunner` es un componente clave en las pruebas de instrumentación en Android. Se especifica en el archivo `build.gradle` de tu proyecto, generalmente dentro del bloque `android.defaultConfig`. Su función principal es actuar como un puente entre el entorno de pruebas (como Android Studio o la línea de comandos) y la aplicación que se está probando, cuando se ejecutan pruebas en un dispositivo real o emulador.
+
+**Relevancia del `testInstrumentationRunner`:**
+
+*   **Entorno de Ejecución Controlado:** Proporciona un entorno controlado para ejecutar las pruebas. Esto significa que puede inicializar el contexto de la aplicación, gestionar el ciclo de vida de los componentes de Android (Activities, Services, etc.) y asegurar que las pruebas se ejecuten en el hilo principal (UI thread) cuando sea necesario.
+*   **Acceso a Recursos del Sistema:** Permite que las pruebas accedan a recursos del sistema Android, como el contexto de la aplicación, los servicios del sistema, y los componentes de la interfaz de usuario. Esto es crucial para las pruebas de integración y las pruebas de interfaz de usuario.
+*   **Coordinación de la Ejecución:** Coordina la ejecución de las pruebas, asegurando que se ejecuten en el orden correcto y que los resultados se reporten adecuadamente.
+
+**Coordinación de la Ejecución en Dispositivos Reales:**
+
+Cuando ejecutas pruebas de instrumentación en un dispositivo real o emulador, el `testInstrumentationRunner` se encarga de:
+
+1.  **Instalación:** Instala el paquete de pruebas (APK) en el dispositivo.
+2.  **Inicialización:** Inicializa el entorno de pruebas en el dispositivo.
+3.  **Ejecución:** Ejecuta las pruebas de instrumentación, que generalmente utilizan frameworks como JUnit y Espresso.
+4.  **Reporte:** Recopila los resultados de las pruebas y los reporta al entorno de desarrollo (Android Studio, línea de comandos, etc.).
+
+En resumen, el `testInstrumentationRunner` es esencial para ejecutar pruebas de instrumentación en Android, especialmente cuando se requiere interactuar con componentes del sistema o probar la interfaz de usuario en dispositivos reales o emulados. Sin él, las pruebas no podrían acceder al entorno de Android de manera controlada y coordinada.",29.9,GRAPH,True,False,True
+¿Puede haber valores anómalos en las fechas proporcionadas dentro del servicio de datos?,"Sí, según la información proporcionada, puede haber valores anómalos en las fechas.
+
+El contexto indica explícitamente que existen ""criterios de confirmación consensuados con el *Product Owner* para tratar situaciones que puedan considerarse anómalas, como **la ausencia de fecha en ciertos elementos de una colección** a la hora de ordenar dicha colección por fecha"".
+
+Esto confirma que se contempla la posibilidad de que algunos elementos no tengan fecha, lo cual se considera una situación anómala para la que se ha definido un plan de acción.",30.21,VECTOR,True,True,True
+¿Hay que tratar casos de valores anómalos en las fechas para los criterios de confirmación?,"Sí, es importante tratar casos de valores anómalos en las fechas dentro de los criterios de confirmación (también conocidos como criterios de aceptación) para las User Stories. Los criterios de confirmación definen las condiciones que una User Story debe satisfacer para ser considerada completa y aceptada.
+
+Considerar valores anómalos en las fechas es crucial para asegurar la robustez y la calidad del software. Esto implica:
+
+1.  **Validación de la entrada:** Asegurarse de que el sistema valide las fechas ingresadas por el usuario, verificando que sean fechas válidas dentro de un rango aceptable.
+2.  **Manejo de errores:** Definir cómo el sistema debe reaccionar ante fechas inválidas o fuera de rango. Esto puede incluir mostrar mensajes de error claros al usuario y evitar que el sistema falle o se comporte de manera inesperada.
+3.  **Pruebas exhaustivas:** Incluir casos de prueba que cubran diferentes tipos de valores anómalos en las fechas, como fechas futuras, fechas pasadas muy lejanas, formatos incorrectos, etc.
+
+Al incluir estos casos en los criterios de confirmación y en las pruebas, se asegura que el software sea capaz de manejar entradas de fecha inesperadas o incorrectas de manera adecuada, mejorando la experiencia del usuario y la fiabilidad del sistema.
+
+Aunque la información recuperada no menciona explícitamente el tratamiento de valores anómalos en fechas, el concepto general de Acceptance Criteria (Criterios de Aceptación) y Confirmation Criterion (Criterio de Confirmación) implica la necesidad de validar la entrada de datos y manejar posibles errores.",33.08,GRAPH,False,False,False

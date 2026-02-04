@@ -35,14 +35,14 @@ st.markdown("""
         right: 0;
         padding: 1rem 2rem;
         z-index: 1000;
-        background-color: var(--secondary-background-color); /* Mejor integración que background-color */
-        box-shadow: 0px -2px 10px rgba(0,0,0,0.1); /* Sutil sombra para separar del chat */
+        background-color: var(--secondary-background-color); 
+        box-shadow: 0px -2px 10px rgba(0,0,0,0.1); 
     }
     
     /* Ajuste de ancho cuando hay sidebar */
     @media (min-width: 576px) {
         [data-testid="stChatInput"] {
-            left: 21rem; /* Coincide con el ancho del sidebar expandido */
+            left: 21rem; 
         }
     }
 </style>
@@ -67,49 +67,23 @@ except ImportError as e:
 
 # INFRAESTRUCTURA
 
-def check_neo4j_status(host="localhost", port=7687, timeout=1):
+def check_neo4j_status(timeout=1):
+    """
+    Comprueba si el puerto de Neo4j está abierto usando la URI configurada en .env.
+    En Docker, esto apuntará al contenedor 'neo4j', no a 'localhost'.
+    """
+    uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
+    
+    # Limpiamos 'bolt://' y extraemos el host y el puerto
+    clean_uri = uri.replace("bolt://", "")
+    host = clean_uri.split(":")[0]
+    port = int(clean_uri.split(":")[1])
+
     try:
         with socket.create_connection((host, port), timeout=timeout):
             return True
     except (socket.timeout, ConnectionRefusedError, OSError):
         return False
-
-def start_docker_services():
-    try:
-        project_root = os.path.abspath(os.path.join(current_dir, ".."))
-        result = subprocess.run(
-            ["docker", "compose", "up", "-d"], 
-            cwd=project_root,
-            capture_output=True, 
-            text=True, 
-            check=True
-        )
-        return True, result.stdout
-    except subprocess.CalledProcessError as e:
-        return False, e.stderr
-    except FileNotFoundError:
-        return False, "No se encuentra el comando docker."
-
-def wait_for_service(max_retries=30, delay=2):
-    status_text = st.empty()
-    bar = st.progress(0)
-    
-    for i in range(max_retries):
-        status_text.text(f"Conectando con base de datos... Intento {i+1}/{max_retries}")
-        bar.progress((i + 1) / max_retries)
-        
-        if check_neo4j_status():
-            status_text.text("Conexion establecida. Estabilizando...")
-            time.sleep(3)
-            status_text.empty()
-            bar.empty()
-            return True
-        
-        time.sleep(delay)
-    
-    status_text.empty()
-    bar.empty()
-    return False
 
 # GESTION DE INGESTA
 
@@ -133,7 +107,6 @@ def run_ingestion_stream(script_args=[]):
         if not script_path:
             yield f"ERROR: No se encontró ingest.py"
             return
-
 
         cmd = [sys.executable, "-u", script_path] + script_args
         
@@ -193,20 +166,7 @@ def main():
             if check_neo4j_status():
                 st.info("Conectado")
             else:
-                st.error("Desconectado")
-                if st.button("Iniciar Docker"):
-                    with st.spinner("Arrancando..."):
-                        success, msg = start_docker_services()
-                        if success:
-                            if wait_for_service():
-                                st.success("Listo")
-                                time.sleep(1)
-                                st.rerun()
-                            else:
-                                st.error("Timeout conectando")
-                        else:
-                            st.error("Error Docker")
-                            st.code(msg)
+                st.error("Desconectado - Reinicia los contenedores desde la terminal")
         with col2:
             st.markdown("**Info**")
             st.text(f"Python: {sys.version.split()[0]}")
@@ -294,7 +254,7 @@ def main():
                     log_placeholder = st.empty()
                     full_log = ""
                     
-                    # Llamada a la función de streaming corregida (run_ingestion_stream)
+                    # Llamada a la función de streaming
                     for line in run_ingestion_stream(script_args):
                         full_log += line
                         # Actualizamos el cuadro de texto

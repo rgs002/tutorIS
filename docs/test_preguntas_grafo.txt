@@ -1,0 +1,15 @@
+¿Es mejor tener una sola historia de usuario para la funcionalidad X o sería más conveniente descomponerla en varias? 
+En el plan de pruebas deben aparecer todos los casos de prueba unitaria de un método, pero a la hora de codificar, ¿con probar uno de ellos es suficiente?
+Tengo que hacer el plan de pruebas de una historia de usuario y para su implementación se han modificado o creado tres clases. Mi duda es, ¿tengo que hacer pruebas unitarias para cada método de cada clase?
+Describe el flujo de trabajo de una prueba automatizada con Espresso (Selección-Acción-Comprobación) y explica por qué es superior a las pruebas manuales en el contexto de la integración continua. 
+En el plan de pruebas deben aparecer todos los casos de prueba unitaria de un método, pero a la hora de codificar, ¿con probar uno de ellos es suficiente?
+Tengo que hacer el plan de pruebas de una historia de usuario y para su implementación se han modificado o creado tres clases. Mi duda es, ¿tengo que hacer pruebas unitarias para cada método de cada clase? ¿Y cómo pongo los valores de entrada? Si no tiene entrada como tal, solo es el hecho de hacer click en un botón y se abre una pantalla.
+¿En qué actividades tengo que ser yo el que le pida al profesor que me evalúe?
+¿En qué actividades evaluables tengo 3 intentos?
+¿Cuantas veces por sprint me voy a reunir con el Product Owner?
+¿En qué asignaturas es evaluable que haya hecho el Informe de Calidad? 
+Si no creo el apk, ¿cuanto me afectará a la nota?
+¿Qué debo hacer si Github Actions me dice que las pruebas no han pasado?
+Hazme una lista de todos los elementos que se evalúan en el proyecto integrado
+¿Cuál es el elemento evaluable más importante en Métodos de Desarrollo?
+¿Qué herramientas voy a necesitar utilizar en el proyecto?

@@ -4,113 +4,49 @@ TutorIS es un sistema de tutoría inteligente diseñado para el apoyo docente en
 
 ## Requisitos del Sistema
 
-* **Python:** Versión 3.11 o 3.12. (Nota: Las versiones 3.13 o superiores presentan incompatibilidad con la dependencia `langchain-neo4j`).
-* **Docker y Docker Compose:** Necesarios para la infraestructura de bases de datos.
+* **Docker y Docker Compose:** Necesarios para desplegar el sistema completo.
 * **Google API Key:** Requerida para la interacción con el modelo Gemini.
 
 ---
 
-## Instalación y Configuración Inicial
+## Instalación y Configuración
 
-### 1. Preparación del Entorno
+### 1. Preparación
 
-Debido a las restricciones de versión de las dependencias, es fundamental crear el entorno virtual apuntando específicamente a Python 3.11. Seleccione las instrucciones según su sistema operativo:
+1.  **Clonar el repositorio:**
+    ```bash
+    git clone https://github.com/rgs002/tutorIS.git
+    cd tutorIS
+    ```
 
-#### Linux: Basado en Debian (Ubuntu, Mint, Kali...)
+2.  **Datos Pre-cargados:**
+    Coloque los datos proporcionados (bases de datos ya generadas) en la carpeta `/data` en la raízdel proyecto. Esto evitará la necesidad de reentrenar el sistema.
+    Nota: en caso de no tener dichos datos y querer generarlos, cree la carpeta `/data` y en su interior, en una carpeta llamada `/raw` deposite los apuntes y materiales docentes.
 
-```bash
-# Instalar Git y Python 3.11 con soporte para entornos virtuales
-sudo apt update
-sudo apt install git python3.11 python3.11-venv
-
-# Clonar el repositorio
-git clone https://github.com/rgs002/tutorIS.git
-cd tutorIS
-
-# Crear y activar el entorno virtual forzando la versión 3.11
-python3.11 -m venv venv
-source venv/bin/activate
-
-# Instalar las dependencias
-pip install --upgrade pip
-pip install -r requirements.txt
-
-```
-
-#### Linux: Basado en Arch (Manjaro, EndeavourOS...)
-
-```bash
-# Instalar Git y la versión específica de Python 3.11
-pamac build python311
-
-# Clonar el repositorio
-git clone https://github.com/rgs002/tutorIS.git
-cd tutorIS
-
-# Crear y activar el entorno virtual forzando la versión 3.11
-python3.11 -m venv venv
-source venv/bin/activate
-
-# Instalar las dependencias
-pip install --upgrade pip
-pip install -r requirements.txt
-
-```
-
-#### Windows (PowerShell)
-
-```powershell
-# Instalar Git y Python 3.11 mediante winget (si no están instalados)
-winget install Git.Git Python.Python.3.11
-
-# Clonar el repositorio
-git clone https://github.com/rgs002/tutorIS.git
-cd tutorIS
-
-# Crear el entorno virtual usando el lanzador de Python para la versión 3.11
-py -3.11 -m venv venv
-
-# Activar el entorno virtual
-.\venv\Scripts\activate
-
-# Instalar las dependencias
-pip install --upgrade pip
-pip install -r requirements.txt
-
-```
-
-> **Nota de seguridad en Windows:** Si recibe un error de ejecución de scripts al activar el entorno, ejecute `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser` y vuelva a intentarlo.
-
-### 2. Variables de Entorno
-
-Configure sus credenciales en el archivo `.env` (basándose en `.env.example`):
-
-* `GOOGLE_API_KEY`: Clave de API de Google AI Studio.
-* `NEO4J_PASSWORD`: Contraseña para la base de datos de grafos.
-* `INGESTION_CHUNK_SIZE`: Tamaño de los fragmentos de texto (caracteres). Modificable según la granularidad deseada.
-* `INGESTION_CHUNK_OVERLAP`: Solapamiento entre fragmentos para mantener el contexto. Modificable.
-* `EMBEDDING_PROVIDER`: Proveedor del modelo de embeddings (predeterminado: `huggingface`).
-* `EMBEDDING_MODEL_HF`: Modelo específico de Sentence-Transformers. Se recomienda mantener el valor por defecto para garantizar la compatibilidad semántica.
-* `VECTOR_RETRIEVAL_K`: Cantidad de candidatos iniciales recuperados de la base vectorial. Modificable para ajustar el *recall*.
-* `RAG_TOP_N`: Número de documentos finales tras el proceso de re-ranking. Modificable para ajustar la precisión.
-* `NEO4J_URI`: Dirección de conexión al grafo. Por defecto utiliza el protocolo `bolt`.
-* `NEO4J_USERNAME` / `NEO4J_PASSWORD`: Credenciales de acceso. Deben coincidir con las configuradas en el despliegue de Docker.
-* `USE_SELF_RAG`: Valor booleano (`True`/`False`) que habilita el bucle de autocrítica post-generación. Modificable para pruebas.
+3.  **Variables de Entorno:**
+    Cree el archivo `.env` basándose en el ejemplo proporcionado:
+    ```bash
+    cp .env.example .env
+    ```
+    Edite el archivo `.env` e introduzca los datos necesarios (como su `GOOGLE_API_KEY`).
 
 ---
 
 ## Ejecución y Uso
 
-La interfaz de usuario centraliza la gestión del sistema, evitando la ejecución manual de scripts adicionales.
-
-### 1. Inicio de la Aplicación
-
-Ejecute el comando principal para lanzar el frontend:
+Para levantar el sistema completo (incluyendo la aplicación y las bases de datos), ejecute:
 
 ```bash
-streamlit run src/frontend_app.py
-
+docker-compose up --build
 ```
+
+Una vez iniciados los contenedores, acceda a la aplicación en su navegador:
+
+**http://localhost:8501**
+
+Para visualizar el grafo y ejecutar consultas Cypher directamente en Neo4j:
+
+**http://localhost:7474**
 
 ### 2. Panel de Gestión de Infraestructura
 
@@ -128,18 +64,7 @@ Nota: Es imprescindible crear el directorio /data/raw y que los subdirectorios q
 * **src/rag_engine/**: Lógica del motor de inferencia, enrutamiento y autoevaluación reflexiva.
 * **src/ingestion/**: Módulos de procesamiento de documentos y persistencia.
 * **src/frontend_app.py**: Interfaz de usuario y panel de administración centralizado.
-* **data/**: Directorio para el almacenamiento de materiales docentes (PDF).
+* **data/raw**: Directorio para el almacenamiento de materiales docentes.
 * **docker-compose.yml**: Orquestación de servicios de base de datos.
 
 ---
-
-### Mantenimiento mediante CLI (Opcional)
-
-Para usuarios avanzados o tareas de depuración, los comandos tradicionales siguen disponibles:
-
-* Levantar base de datos: `docker-compose up -d`
-* Ingesta: `python src/ingest.py`
-
----
-
-**¿Te gustaría que te ayude a guardar este texto directamente en un archivo usando un comando de terminal, o prefieres copiar y pegar manualmente?**
