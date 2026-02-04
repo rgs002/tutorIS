@@ -127,20 +127,20 @@ class GraphRetriever:
         WITH path LIMIT 100
         UNWIND relationships(path) AS r
         RETURN DISTINCT 
-            {
+            {{
                 id: startNode(r).id, 
                 label: head(labels(startNode(r))),
                 definition: startNode(r).definition,
                 asignatura: startNode(r).asignatura
-            } AS source,
+            }} AS source,
             type(r) AS type,
-            {
+            {{
                 id: endNode(r).id, 
                 label: head(labels(endNode(r))), 
                 definition: endNode(r).definition, 
                 asignatura: endNode(r).asignatura,
                 embedding: endNode(r).embedding
-            } AS target
+            }} AS target
         """
         try:
             return self.graph.query(cypher, {"anchor_names": anchor_names})
