@@ -43,17 +43,19 @@ def get_user_config():
         # Parámetros específicos de Grafo
         graph_k = int(os.getenv("GRAPH_RETRIEVAL_K", 5))
         graph_depth = int(os.getenv("GRAPH_TRAVERSAL_DEPTH", 2))
+        graph_threshold = float(os.getenv("GRAPH_ANCHOR_THRESHOLD", 0.40))
         
         # Parámetros generales (para mantener consistencia en logs/archivos)
         chunk_size = int(os.getenv("INGESTION_CHUNK_SIZE", 1000))
 
         print(f" >> Graph Retrieval K (Anclas): {graph_k}")
         print(f" >> Graph Traversal Depth (Saltos): {graph_depth}")
+        print(f" >> Graph Anchor Threshold: {graph_threshold}")
         print(f" >> (Ref) Chunk Size: {chunk_size}")
 
-        return graph_k, graph_depth, chunk_size
+        return graph_k, graph_depth, graph_threshold, chunk_size
     except ValueError:
-        print("[ERROR] Las variables de entorno deben ser números enteros.")
+        print("[ERROR] Las variables de entorno deben ser números válidos.")
         sys.exit(1)
 
 def find_questions_file():
@@ -85,12 +87,17 @@ bench_ctx = BenchmarkContext()
 
 # ---------------- DEFINICIÓN DE PARCHES (MOCKS) ----------------
 
-def create_configured_graph_retriever_class(target_k, target_depth):
+def create_configured_graph_retriever_class(target_k, target_depth, target_threshold):
     """
     Crea una clase Mock que hereda del GraphRetriever original pero
-    sobrescribe los métodos de búsqueda para inyectar K y Depth.
+    sobrescribe los métodos de búsqueda para inyectar K, Depth y Threshold.
     """
     class ConfiguredGraphRetriever(RealGraphRetriever):
+        def __init__(self):
+            super().__init__()
+            self.anchor_threshold = target_threshold
+            print(f"  -> [BENCHMARK] Usando Threshold={target_threshold} (Override).")
+
         def _get_anchors(self, query, k=None):
             # Forzamos el k configurado
             print(f"  -> [BENCHMARK] Usando K={target_k} para anclas (Override).")
@@ -172,7 +179,7 @@ class InstrumentedRAGEngine(RAGEngine):
 # ---------------- MAIN ----------------
 
 def main():
-    graph_k, graph_depth, chunk_size = get_user_config()
+    graph_k, graph_depth, graph_threshold, chunk_size = get_user_config()
     
     q_file = find_questions_file()
     if not q_file:
@@ -219,7 +226,7 @@ def main():
     print("\n--- INICIANDO BENCHMARK GRAFO (Simulación Humana) ---\n")
     
     app_main._engine_instance = None
-    ConfiguredGraphRetriever = create_configured_graph_retriever_class(graph_k, graph_depth)
+    ConfiguredGraphRetriever = create_configured_graph_retriever_class(graph_k, graph_depth, graph_threshold)
 
     # Parcheamos GraphRetriever en rag_engine.engine, que es donde RAGEngine lo importa/usa
     with patch('builtins.input', side_effect=simulated_input), \
@@ -234,7 +241,7 @@ def main():
         except Exception as e:
             print(f"\n[ERROR CRÍTICO EN EJECUCIÓN]: {e}")
 
-    output_filename = f"bench_graph_k{graph_k}_d{graph_depth}_s{chunk_size}.csv"
+    output_filename = f"bench_graph_k{graph_k}_d{graph_depth}_t{graph_threshold}_s{chunk_size}.csv"
     output_path = os.path.join(PROJECT_ROOT, 'tests', 'resultados', output_filename)
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 

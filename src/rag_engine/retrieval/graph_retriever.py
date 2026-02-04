@@ -28,9 +28,11 @@ class GraphRetriever:
         # Configuración de recuperación desde variables de entorno
         self.retrieval_k = int(os.getenv("GRAPH_RETRIEVAL_K", 5))
         self.traversal_depth = int(os.getenv("GRAPH_TRAVERSAL_DEPTH", 2))
+        self.anchor_threshold = float(os.getenv("GRAPH_ANCHOR_THRESHOLD", 0.40))
+        self.llm_model_name = os.getenv("GOOGLE_MODEL_NAME", "gemini-2.5-pro")
 
         self.llm = ChatGoogleGenerativeAI(
-            model="gemini-2.0-flash",
+            model=self.llm_model_name,
             temperature=0,
             google_api_key=os.getenv("GOOGLE_API_KEY")
         )
@@ -80,7 +82,7 @@ class GraphRetriever:
             anchors = []
             
             # Buscamos en los índices de las 4 categorías principales
-            # Nota: Ajustamos el umbral de score (0.5) para filtrar ruido pero permitir coincidencias semánticas
+            # Nota: Usamos self.anchor_threshold para filtrar ruido pero permitir coincidencias semánticas
             for label in ["ConceptoTeorico", "Metodologia", "Tecnologia", "Artefacto"]:
                 print(f"  -> [DEBUG] Consultando índice: vector_{label}")
                 cypher = f"""
@@ -96,10 +98,10 @@ class GraphRetriever:
 
                 for row in result:
                     print(f"     -> Candidato: '{row['name']}' (Score: {row['score']:.4f})")
-                    if row['score'] > 0.40:
+                    if row['score'] > self.anchor_threshold:
                         anchors.append(row)
                     else:
-                        print("        -> [DESCARTADO] Score bajo (< 0.30)")
+                        print(f"        -> [DESCARTADO] Score bajo (< {self.anchor_threshold:.2f})")
             
             # Ordenamos por relevancia global y nos quedamos con los top K
             anchors.sort(key=lambda x: x['score'], reverse=True)
