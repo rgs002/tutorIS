@@ -1,0 +1,195 @@
+question,response,time_sec,route,relevant,supported,useful
+¿Es mejor tener una sola historia de usuario para la funcionalidad X o sería más conveniente descomponerla en varias?,"Analizando la información disponible, la recomendación general es descomponer una funcionalidad compleja en varias historias de usuario más pequeñas y manejables. La razón principal se centra en el concepto de **independencia**.
+
+Según los principios de desarrollo que se manejan, se debe evitar la dependencia innecesaria entre historias de usuario para asegurar que cada una sea independiente. Si mantienes la funcionalidad X como una única historia de gran tamaño, es muy probable que genere dependencias complejas y dificulte su gestión, desarrollo y prueba.
+
+Descomponerla en historias más pequeñas te aporta varias ventajas:
+
+1.  **Facilita las pruebas**: Cada historia de usuario debe poder ser validada de forma independiente. Como se indica en el documento `definicionCompletado.md`, para que una historia se considere completada, debe superar las pruebas definidas para ella. Es mucho más sencillo definir y ejecutar pruebas para una funcionalidad pequeña y específica que para una grande y compleja.
+
+2.  **Promueve la independencia**: Al dividir la funcionalidad, puedes trabajar en piezas que entregan valor por sí mismas sin depender de que otras partes estén terminadas. Esto reduce cuellos de botella y permite un flujo de trabajo más ágil.
+
+3.  **Mejora la estimación y planificación**: Es más fácil estimar el esfuerzo requerido para una historia pequeña y bien definida. Esto permite al equipo planificar los sprints de manera más precisa y entregar valor de forma incremental y constante.
+
+En resumen, aunque pueda parecer más trabajo al principio, descomponer la funcionalidad X en varias historias de usuario te ayudará a crear un producto de mayor calidad, facilitará las pruebas y permitirá una gestión más eficiente del proyecto.",46.16,GRAPH,True,False,True
+"En el plan de pruebas deben aparecer todos los casos de prueba unitaria de un método, pero a la hora de codificar, ¿con probar uno de ellos es suficiente?","Hola. Es una excelente pregunta que conecta la planificación con la implementación de las pruebas.
+
+La respuesta es que **no, no es suficiente probar solo uno de los casos de prueba definidos en el plan.**
+
+Analizando la información de las asignaturas, podemos ver por qué:
+
+1.  **El propósito del Plan de Pruebas:** El `Plan de Pruebas` es el documento que define el alcance, el enfoque y el conjunto de pruebas a realizar para verificar el correcto funcionamiento del sistema. Si en la fase de diseño se determinó que un método necesita varios casos de prueba, es porque cada uno de ellos está diseñado para validar un escenario, una condición o un camino de ejecución diferente (por ejemplo, un caso para datos válidos, otro para datos nulos, otro para un valor límite, etc.).
+
+2.  **La naturaleza de un Caso de Prueba:** Un `Caso de Prueba` es una especificación con entradas, condiciones y resultados esperados concretos. Omitir la codificación de los casos de prueba definidos en el plan implica dejar partes del comportamiento del método sin verificar, lo que aumenta el riesgo de que existan errores no detectados.
+
+3.  **El objetivo del Testing:** El objetivo final del `Testing` es evaluar la calidad del software, encontrar errores y asegurar que cumple con los requisitos. Probar un único escenario de los muchos posibles no proporciona la confianza necesaria sobre la robustez y corrección del método.
+
+En resumen, a la hora de codificar, **debes implementar todos los casos de prueba que se han especificado en el `Plan de Pruebas`**. El plan es tu guía para asegurar una cobertura de pruebas adecuada y garantizar la calidad del software que estás desarrollando.",49.36,GRAPH,False,False,False
+"Tengo que hacer el plan de pruebas de una historia de usuario y para su implementación se han modificado o creado tres clases. Mi duda es, ¿tengo que hacer pruebas unitarias para cada método de cada clase?","Hola,
+
+Es una muy buena pregunta y es clave para realizar un plan de pruebas sólido. La respuesta corta es que sí, el objetivo es asegurar la correcta funcionalidad de cada clase, y esto se logra principalmente a través de la prueba de sus métodos.
+
+Analizando la información de la asignatura, podemos concretar más esta idea:
+
+1.  **El Foco está en los Métodos:** La propia definición de **Prueba Unitaria** indica que su propósito es ""verificar el correcto funcionamiento de unidades individuales de código, como funciones o métodos"". Esto confirma que tu enfoque debe estar a nivel de método. De hecho, el concepto **Prueba de Método** se describe específicamente como las pruebas ""enfocadas en verificar el comportamiento y la correcta ejecución de los métodos de una clase"".
+
+2.  **Prioriza la Lógica de Negocio:** Si bien el objetivo es cubrir los métodos, en la práctica debes centrarte en aquellos que contienen lógica de negocio, condiciones, bucles o que modifican el estado del objeto de forma significativa. Los métodos muy simples, como *getters* o *setters* básicos que solo asignan un valor, generalmente no requieren una prueba dedicada, a menos que contengan alguna validación.
+
+3.  **Prueba la Interfaz Pública:** La buena práctica en pruebas unitarias es probar el ""contrato"" público de una clase, es decir, sus métodos públicos. Los métodos privados son detalles de implementación y se prueban de forma indirecta cuando se prueba el método público que los utiliza.
+
+4.  **Aislar las Clases:** Para probar correctamente los métodos de una clase que depende de otra, la documentación destaca el uso de **Objetos Mock**. Estos te permiten simular el comportamiento de las clases dependientes y así garantizar que estás probando la lógica de una única unidad de forma aislada, tal como lo requiere la metodología de **Prueba Unitaria**.
+
+**En resumen, para tu plan de pruebas:**
+
+Sí, debes planificar pruebas unitarias para los métodos de las tres clases nuevas o modificadas. Céntrate en los métodos públicos que implementen la funcionalidad descrita en la historia de usuario y que contengan la lógica principal. Recuerda planificar también el uso de **Mocks** para aislar cada clase durante sus pruebas.
+
+Espero que esto aclare tu duda. ¡Mucho ánimo con ese plan de pruebas",55.5,GRAPH,False,False,False
+Describe el flujo de trabajo de una prueba automatizada con Espresso (Selección-Acción-Comprobación) y explica por qué es superior a las pruebas manuales en el contexto de la integración continua.,"¡Hola! Como TutorIS, estoy aquí para ayudarte a resolver tu duda. Analicemos el flujo de trabajo de Espresso y su importancia en la integración continua basándonos en la información de las asignaturas.
+
+### Flujo de Trabajo de una Prueba con Espresso
+
+Según la documentación del curso, una prueba de interfaz de usuario (UI) con Espresso sigue un flujo de trabajo fundamental que se puede resumir en tres pasos claros: **Selección, Acción y Comprobación**.
+
+Este patrón hace que las pruebas sean fáciles de leer y mantener. Veamos cada paso:
+
+1.  **Selección (Select):** El primer paso consiste en localizar un elemento específico en la interfaz de usuario con el que se quiere interactuar. Espresso proporciona métodos como `onView()` para encontrar vistas que están actualmente en la jerarquía de la pantalla, o `onData()` para elementos dentro de listas o adaptadores (como en un `ListView` o `RecyclerView`).
+2.  **Acción (Perform):** Una vez que el elemento ha sido seleccionado, el siguiente paso es simular una interacción del usuario sobre él. Esto se logra con el método `perform()`, que puede ejecutar acciones como hacer clic (`click()`), escribir texto (`typeText()`) o deslizar (`swipeLeft()`).
+3.  **Comprobación (Check):** Finalmente, después de la acción, es necesario verificar que la interfaz de usuario ha reaccionado de la manera esperada. El método `check()` se utiliza para hacer una aserción sobre el estado del elemento o de otros elementos en la pantalla. Por ejemplo, se puede comprobar si un texto ha aparecido (`isDisplayed()`) o si su contenido es el correcto (`withText(""..."")`).
+
+Este flujo se detalla en los materiales de la asignatura, como el seminario sobre Espresso (`ps-2324-semExpresso.pdf`), donde se explica cómo estos métodos (`onView`, `perform`, `check`) son los pilares para construir pruebas de UI robustas en Android.
+
+### Superioridad sobre las Pruebas Manuales en Integración Continua (CI)
+
+La automatización de pruebas con herramientas como Espresso es fundamental en un entorno de Integración Continua (CI), y es significativamente superior a las pruebas manuales por varias razones clave:
+
+*   **Velocidad y Eficiencia:** En un ciclo de CI, el código se integra con frecuencia, a veces varias veces al día. Ejecutar manualmente un conjunto completo de pruebas de regresión para cada integración sería extremadamente lento y un cuello de botella para el equipo de desarrollo. Las pruebas automatizadas se ejecutan en minutos, proporcionando feedback casi instantáneo.
+*   **Fiabilidad y Consistencia:** Las pruebas manuales son propensas a errores humanos. Un tester puede olvidar un paso, realizarlo de forma incorrecta o interpretar un resultado de manera subjetiva. Las pruebas automatizadas, como se describe en la documentación del `Proyecto Integrado` (`pruebas.md`), son scripts que ejecutan exactamente los mismos pasos cada vez, garantizando resultados consistentes y fiables.
+*   **Detección Temprana de Errores:** El objetivo de la CI es detectar problemas lo antes posible. Como se indica en la definición de `Automated Test`, todas las pruebas deben ejecutarse con éxito cuando se integra un nuevo incremento. Si una prueba de Espresso falla, el proceso de integración se detiene automáticamente, notificando al desarrollador que su cambio ha introducido un error (una regresión) antes de que este llegue a otras fases del desarrollo.
+*   **Reducción del Esfuerzo Manual:** La automatización de pruebas (`Test Automation`) libera a los desarrolladores y testers de la tarea repetitiva y tediosa de probar manualmente la aplicación. Esto les permite centrarse en tareas más complejas, como el diseño de nuevos casos de prueba o el desarrollo de nuevas funcionalidades.
+
+En resumen, mientras que las pruebas manuales son lentas y difíciles de escalar, las pruebas automatizadas con Espresso se integran perfectamente en los flujos de CI, proporcionando una red de seguridad rápida y fiable que garantiza la calidad y estabilidad del software con cada cambio.",57.75,GRAPH,False,False,False
+"En el plan de pruebas deben aparecer todos los casos de prueba unitaria de un método, pero a la hora de codificar, ¿con probar uno de ellos es suficiente?","¡Hola! Soy TutorIS, tu tutor de Ingeniería del Software. Vamos a resolver tu duda.
+
+Basándome en la información de las asignaturas, la respuesta corta es: **no, no es suficiente probar solo uno de los casos de prueba.** Debes codificar todos los casos de prueba que has definido en tu plan de pruebas.
+
+Aquí te explico por qué:
+
+1.  **El Plan de Pruebas guía la implementación:** El `Plan de Pruebas` no es solo un documento teórico. Según la documentación, es el artefacto que ""especifica el conjunto de pruebas a realizar sobre un sistema para verificar su correcto funcionamiento"" y, en el contexto del proyecto, ""indica las pruebas implementadas en el código de la aplicación"". Esto significa que debe existir una correspondencia directa entre lo que planificas y lo que finalmente codificas. El plan es tu hoja de ruta para la implementación de las pruebas.
+
+2.  **El objetivo es la calidad y la cobertura:** El propósito del `Testing` es ""evaluar la calidad del software, identificando errores y asegurando que cumple con los requisitos"". Cada `Caso de Prueba` se diseña para verificar una condición específica, una ruta de ejecución o un valor límite del método. Si solo implementas un caso, dejas la mayor parte del comportamiento del método sin verificar, lo que podría ocultar errores importantes.
+
+3.  **Completitud de los requisitos:** Un concepto relevante es el `Requirement Trace Result`, que muestra la ""completitud de la cobertura de requisitos en los procesos de diseño y pruebas"". Para asegurar que un requisito está completamente cubierto, necesitas implementar todos los casos de prueba que lo validan. Omitir casos de prueba equivale a una cobertura incompleta.
+
+En resumen, el plan de pruebas detalla *todos* los escenarios que son necesarios para garantizar que un método funciona correctamente. Implementar solo uno de ellos invalida el propósito de haber diseñado un conjunto completo de pruebas y deja la calidad del software en entredicho. Para una correcta validación, es fundamental que todos los casos de prueba definidos en el plan sean implementados y ejecutados.",50.69,GRAPH,True,True,True
+"Tengo que hacer el plan de pruebas de una historia de usuario y para su implementación se han modificado o creado tres clases. Mi duda es, ¿tengo que hacer pruebas unitarias para cada método de cada clase? ¿Y cómo pongo los valores de entrada? Si no tiene entrada como tal, solo es el hecho de hacer click en un botón y se abre una pantalla.","Hola, entiendo perfectamente tu duda. Es una pregunta muy común al empezar a diseñar planes de prueba. Vamos a desglosarla para que quede claro cómo enfocarlo.
+
+Basándome en la información de las asignaturas, la clave está en diferenciar el tipo de prueba que necesitas para cada cosa.
+
+### 1. ¿Debo probar todos los métodos de cada clase?
+
+No es estrictamente necesario probar *todos* los métodos de cada clase de forma individual. El objetivo de las **Pruebas Unitarias** es verificar el correcto funcionamiento de los componentes individuales, centrándote en la lógica de negocio.
+
+*   **Qué probar:** Deberías enfocarte en los métodos públicos que contienen lógica importante. Por ejemplo, métodos que realizan cálculos, toman decisiones (con `if/else`, `switch`), o modifican el estado del objeto de una manera significativa.
+*   **Qué no suele probarse (o se prueba indirectamente):** Métodos muy simples como *getters* y *setters* básicos generalmente no requieren una prueba unitaria dedicada, ya que no contienen lógica compleja. Se prueban de forma implícita cuando verificas el comportamiento de otros métodos que los usan.
+
+### 2. ¿Cómo pongo los valores de entrada y manejo las dependencias?
+
+Aquí es donde entran en juego los conceptos de **Objeto Mock** y **Objeto Stub**. La documentación del curso indica que las pruebas unitarias los utilizan para aislar la clase que estás probando.
+
+*   **Valores de entrada directos:** Si un método recibe parámetros simples (como un número o una cadena de texto), en tu código de prueba simplemente llamas a ese método pasándole los valores que quieras probar.
+*   **Dependencias con otras clases:** Si tu clase necesita interactuar con otra (por ejemplo, una clase `Factura` que necesita un `RepositorioClientes` para obtener datos), no usarás un repositorio real en tu prueba unitaria. En su lugar, crearás un **Objeto Mock** de `RepositorioClientes`.
+    *   Con el Mock, puedes simular el comportamiento de la dependencia. Por ejemplo, puedes decirle: ""cuando se llame al método `obtenerCliente(1)`, devuelve este objeto Cliente de prueba"".
+    *   Esto te permite probar la lógica de tu clase `Factura` de forma aislada, sin depender de que la base de datos o el repositorio funcionen. La información de la asignatura de `procesos_de_ingenieria_de_software` menciona específicamente el uso de *frameworks* como **Mockito** para facilitar la creación de estos Mocks.
+
+### 3. El clic en un botón: La diferencia clave
+
+Tu pregunta sobre hacer clic en un botón y que se abra una pantalla es fundamental, porque nos ayuda a diferenciar entre tipos de pruebas.
+
+*   **Prueba Unitaria:** Una prueba unitaria **no** simula el clic de un botón. Lo que haría una prueba unitaria es probar el método que se ejecuta *como consecuencia* de ese clic. Por ejemplo, si al hacer clic se llama al método `miControlador.navegarAPantallaDetalle()`, tu prueba unitaria llamaría directamente a ese método y verificaría que la lógica interna es correcta. Usando un Mock del sistema de navegación, podrías comprobar que se ha intentado navegar a la pantalla correcta, pero sin levantar la interfaz gráfica.
+
+*   **Prueba de Interfaz de Usuario (UI) o Integración:** La acción de ""hacer clic en un botón y ver que se abre una pantalla"" se verifica con otro tipo de pruebas, como las pruebas de interfaz de usuario. Estas pruebas sí automatizan la interacción real del usuario con la aplicación. En los materiales del curso, como el documento `ps-2324-semExpresso.pdf`, se mencionan herramientas específicas para este tipo de pruebas en Android, que son distintas de las que se usan para las pruebas unitarias puras.
+
+**En resumen:**
+
+1.  **Crea pruebas unitarias** para la lógica de negocio de tus tres clases nuevas o modificadas. No es necesario para cada método, sino para los que tienen una funcionalidad relevante.
+2.  **Usa Objetos Mock** (con herramientas como Mockito) para simular las dependencias que tengan esas clases y poder probarlas de forma aislada.
+3.  **Diferencia las pruebas:** La lógica de negocio se prueba con **pruebas unitarias**. La interacción del usuario (clics, navegación entre pantallas) se prueba con **pruebas de interfaz de usuario**. Tu plan de pruebas debería contemplar ambos tipos si la historia de usuario lo requiere.
+
+Espero que esta explicación te ayude a estructurar mejor tu plan de pruebas. ¡Mucho ánimo",61.95,GRAPH,False,False,False
+¿En qué actividades tengo que ser yo el que le pida al profesor que me evalúe?,"Analizando la información disponible en los documentos del curso, como `ejercicioSeguridadAsignacion.docx`, no se detalla un procedimiento específico en el que debas solicitar activamente una evaluación al profesor. La documentación se centra principalmente en la gestión y seguridad de las asignaciones de tareas, como su creación, modificación y los riesgos asociados a su eliminación no deseada.
+
+Por lo tanto, basándome en la práctica habitual en asignaturas de Ingeniería del Software, el proceso de evaluación suele estar ligado a las fechas de entrega establecidas para cada actividad o hito del proyecto.
+
+Generalmente, no es necesario que pidas una evaluación. Lo habitual es que entregues tu trabajo (un documento, un prototipo, código fuente, etc.) a través de la plataforma del curso antes de la fecha límite, y el profesor procederá a evaluarlo según el calendario académico.
+
+Te recomiendo que consultes la guía docente de la asignatura o el cronograma del curso, ya que ahí es donde se suelen especificar las fechas de entrega, los criterios y el método de evaluación para cada actividad.",41.27,GRAPH,True,False,True
+¿En qué actividades evaluables tengo 3 intentos?,"Lo siento, no estoy seguro de cómo clasificar tu pregunta. ¿Podrías reformularla?",19.66,UNKNOWN,False,False,False
+¿Cuantas veces por sprint me voy a reunir con el Product Owner?,"Basándote en la información del contexto, te reunirás con el Product Owner formalmente al menos dos veces por sprint:
+
+1.  **Sprint Planning Meeting I**: Se realiza al comienzo de cada sprint para seleccionar, en colaboración con el Product Owner, los elementos del Product Backlog que se van a desarrollar.
+2.  **Product Review**: Tiene lugar al inicio del segundo viernes de cada sprint. En esta reunión, el equipo muestra el trabajo realizado al Product Owner para verificar que se adecúa a lo esperado.",29.18,VECTOR,True,True,True
+¿En qué asignaturas es evaluable que haya hecho el Informe de Calidad?,"Hola,
+
+Analizando la documentación de las asignaturas, el **Informe de Calidad** es un artefacto evaluable específicamente en la asignatura de **Proyecto Integrado**.
+
+Este informe es un documento que se genera periódicamente durante los **Sprints** para evaluar el estado de la calidad del software. Según se indica en los documentos de evaluación de la asignatura (`evaluacion.md` y `evaluacionCalidad.md` en la carpeta de `proyecto_Integrado`), este informe representa un 10% de la calificación final.
+
+Para su elaboración, es necesario utilizar los análisis generados por herramientas como **SonarCloud**, que sirven como base para identificar problemas y planificar las acciones de mejora correspondientes.",45.98,GRAPH,True,True,True
+"Si no creo el apk, ¿cuanto me afectará a la nota?","Hola,
+
+Analizando la información proporcionada, no he encontrado detalles específicos sobre la evaluación o la penalización exacta por no entregar el archivo APK. Los documentos de referencia, como `ir-Ordinaria-2025.docx`, se centran en los conceptos de la ingeniería de requisitos y no en los criterios de calificación del proyecto.
+
+Sin embargo, basándome en la práctica habitual en las asignaturas de Ingeniería del Software, no entregar el archivo APK suele tener un impacto muy significativo y negativo en la nota. Te explico por qué:
+
+1.  **Es la evidencia del trabajo:** El APK es la evidencia tangible de que la `Aplicacion` ha sido desarrollada y es funcional. Es el resultado final que permite al profesor verificar que los `Casos de Uso` definidos, como **Realizar Apuesta**, se han implementado correctamente.
+2.  **Imposibilita la validación:** Sin el ejecutable, es imposible realizar las **Pruebas de Aceptación** para comprobar si el sistema satisface los requisitos y cumple los **Objetivos** del usuario final (en este contexto, el **Jugador de Apuestas**).
+3.  **Demuestra la finalización del ciclo:** Generar el entregable final es una parte crucial del ciclo de desarrollo. No hacerlo se interpreta como que el proyecto está incompleto.
+
+En resumen, aunque no puedo darte un número exacto de puntos, **no entregar el APK probablemente resulte en una calificación muy baja o incluso en un suspenso** en la parte práctica de la asignatura. Es el artefacto principal que demuestra que has construido el software que se pedía.
+
+Te recomiendo encarecidamente que priorices su generación y entrega. Si tienes problemas para crearlo, es mejor que consultes cómo solucionarlos.",52.94,GRAPH,True,False,True
+¿Qué debo hacer si Github Actions me dice que las pruebas no han pasado?,"Hola. Cuando GitHub Actions indica que las pruebas no han pasado, está reportando un **`Failure`**.
+
+Según la documentación del curso, este estado es una señal importante que no debes ignorar. Concretamente, en el documento **politicaConfiguracion.md** del Proyecto Integrado, se establece que un `Failure` en GitHub Actions marca el *commit* correspondiente como fallido.
+
+Esto significa que una o varias de las pruebas automatizadas (como las pruebas unitarias o de integración) han detectado un comportamiento inesperado en el software. Un `Failure` puede indicar:
+
+1.  **Errores en la funcionalidad**: Se ha detectado un **`Fallo Funcional`** en el código. Las pruebas unitarias y de integración están diseñadas precisamente para encontrar estos problemas.
+2.  **Problemas de integración**: El fallo puede señalar que hay problemas en la interacción entre diferentes componentes del sistema, los cuales deben ser resueltos antes de continuar con la integración.
+
+**¿Qué debes hacer?**
+
+Tu principal objetivo es analizar la causa del fallo y corregirla. Los pasos a seguir son:
+
+1.  **Revisa los logs de GitHub Actions**: La salida de la ejecución te mostrará exactamente qué pruebas han fallado y, a menudo, proporcionará mensajes de error que te ayudarán a diagnosticar el problema.
+2.  **Depura tu código**: Una vez identificada la prueba fallida, reproduce el error en tu entorno de desarrollo local. Depura el código para encontrar y corregir el defecto subyacente.
+3.  **Vuelve a ejecutar las pruebas localmente**: Antes de subir tus correcciones, asegúrate de que todas las pruebas pasan en tu máquina.
+4.  **Envía la corrección**: Haz un nuevo *commit* con los arreglos. GitHub Actions se ejecutará de nuevo y, si todo está correcto, el estado cambiará a exitoso.
+
+Recuerda que el proceso de pruebas, incluyendo la gestión de los fallos detectados, se documenta en el **`Plan De Pruebas`** y su correspondiente **`Informe De Pruebas`**.",46.18,GRAPH,False,False,False
+Hazme una lista de todos los elementos que se evalúan en el proyecto integrado,"¡Hola! Con gusto te ayudo a entender qué se evalúa en el Proyecto Integrado.
+
+Analizando la información de las asignaturas, los elementos que se evalúan en el desarrollo del Proyecto Integrado son los siguientes:
+
+*   **Calidad y Auditoría:** Se evalúan aspectos relacionados con la calidad del software y la realización de una auditoría sobre el proyecto. La documentación indica que el proyecto incluye tareas específicas que son evaluadas en la asignatura de Calidad y Auditoría, llegando a representar una parte importante de la nota en dicha materia (según el documento `evaluacionCalidad.md`).
+*   **Métodos de Desarrollo:** Se valora la aplicación práctica de los conceptos de diseño e implementación vistos en la asignatura.
+*   **Plan de Pruebas:** Este es un artefacto fundamental. Se evalúa el diseño y la implementación de un plan de pruebas para la aplicación, que debe detallar los niveles, estrategias y técnicas a utilizar. La información especifica que este documento puede llegar a contribuir con un 10% de la calificación final.
+*   **Aplicación de Prácticas Ágiles (Scrum):** Se evalúa la correcta aplicación de la metodología Scrum durante el desarrollo. Existen rúbricas específicas para valorar el desempeño en este aspecto, como se sugiere en el fichero `indexRubricasScrum.md`.
+*   **Documentación:** La creación de la documentación del proyecto, como diagramas y manuales, es una parte integral y evaluable del proceso.
+*   **Componentes específicos del proyecto:** El proyecto se divide en diferentes ""Elementos Evaluables"", que son componentes o entregas que se califican en distintas etapas del desarrollo.
+
+En resumen, el Proyecto Integrado es una evaluación continua donde se valora la aplicación práctica de los conocimientos de varias asignaturas, centrándose en la calidad, la metodología, las pruebas y la documentación generada.
+
+Espero que esta lista te sea de gran ayuda. ¡Si tienes alguna otra duda, no dudes en consultarme",45.36,GRAPH,False,False,False
+¿Cuál es el elemento evaluable más importante en la asignatura Métodos de Desarrollo?,"Analizando la información disponible, la evaluación en la asignatura de Métodos de Desarrollo se centra de manera fundamental en el **proyecto integrado**.
+
+Según la documentación, el proceso de evaluación para esta asignatura se define específicamente como el ""proceso para determinar el valor o calidad del proyecto integrado"". Esto indica que tu desempeño y aplicación de los conceptos se mide a través de este proyecto.
+
+Dentro del proyecto, existen los ""Elementos Evaluables de Método de Desarrollo"", que son los aspectos concretos de la metodología que utilizáis y que se someten a evaluación para comprobar su eficacia y calidad. Por lo tanto, aunque se evalúan distintos aspectos, todos forman parte del desarrollo y la ejecución del proyecto integrado, convirtiéndolo en el elemento evaluable más importante.
+
+Puedes encontrar más detalles sobre cómo se estructura esta valoración en los documentos de la carpeta `proyecto_Integrado/evaluacion/`, como `evaluacion.md`.",37.89,GRAPH,True,True,True
+¿Qué herramientas voy a necesitar utilizar en el Proyecto Integrado? Dime donde se mencionan.,"Basándome en el contexto proporcionado, la información sobre las herramientas que necesitarás se menciona al principio del documento, en la sección titulada **""# Herramientas""**.
+
+En esa sección se indica lo siguiente: ""Esta página contiene una lista de las herramientas que se utilizarán para el desarrollo del proyecto integrado; así como las instrucciones necesarias para su instalación y configuración"".
+
+Sin embargo, el texto **no especifica cuáles son esas herramientas**, solo menciona que en esa página se encuentra la lista completa.",26.96,VECTOR,True,True,True

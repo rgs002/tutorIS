@@ -11,5 +11,5 @@ Tengo que hacer el plan de pruebas de una historia de usuario y para su implemen
 Si no creo el apk, ¿cuanto me afectará a la nota?
 ¿Qué debo hacer si Github Actions me dice que las pruebas no han pasado?
 Hazme una lista de todos los elementos que se evalúan en el proyecto integrado
-¿Cuál es el elemento evaluable más importante en Métodos de Desarrollo?
-¿Qué herramientas voy a necesitar utilizar en el proyecto?
+¿Cuál es el elemento evaluable más importante en la asignatura Métodos de Desarrollo?
+¿Qué herramientas voy a necesitar utilizar en el Proyecto Integrado? Dime donde se mencionan.

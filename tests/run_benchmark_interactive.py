@@ -44,13 +44,17 @@ def get_user_config():
         chunk_overlap = int(os.getenv("INGESTION_CHUNK_OVERLAP", 200))
         k = int(os.getenv("VECTOR_RETRIEVAL_K", 10))
         top_n = int(os.getenv("RAG_TOP_N", 5))
+        
+        use_self_rag_str = os.getenv("USE_SELF_RAG", "True")
+        use_self_rag = use_self_rag_str.lower() in ("true", "1", "yes", "on")
 
         print(f" >> Chunk Size: {chunk_size}")
         print(f" >> Chunk Overlap: {chunk_overlap}")
         print(f" >> K (Docs a recuperar): {k}")
         print(f" >> Top N (Docs tras re-ranking): {top_n}")
+        print(f" >> Use Self RAG: {use_self_rag}")
 
-        return chunk_size, chunk_overlap, k, top_n
+        return chunk_size, chunk_overlap, k, top_n, use_self_rag
     except ValueError:
         print("[ERROR] Las variables de entorno deben ser números enteros.")
         sys.exit(1)
@@ -156,7 +160,7 @@ class InstrumentedRAGEngine(RAGEngine):
 
 def main():
     # 1. Obtener configuración
-    chunk_size, chunk_overlap, k, top_n = get_user_config()
+    chunk_size, chunk_overlap, k, top_n, use_self_rag = get_user_config()
     
     # Construir ruta de la DB Vectorial
     db_folder_name = f"chroma_db_{chunk_size}_{chunk_overlap}"
@@ -248,7 +252,8 @@ def main():
             print(f"\n[ERROR CRÍTICO EN EJECUCIÓN]: {e}")
 
     # 6. Guardar Resultados
-    output_filename = f"bench_s{chunk_size}_o{chunk_overlap}_k{k}_n{top_n}.csv"
+    suffix = "" if use_self_rag else "_no_eval"
+    output_filename = f"bench_s{chunk_size}_o{chunk_overlap}_k{k}_n{top_n}{suffix}.csv"
     output_path = os.path.join(PROJECT_ROOT, 'tests', 'resultados', output_filename)
     
     # Asegurar que el directorio tests existe
