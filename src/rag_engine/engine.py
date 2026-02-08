@@ -24,6 +24,10 @@ class RAGEngine:
         self.graph_retriever = GraphRetriever()
 
         self.use_self_rag = os.getenv("USE_SELF_RAG", "False").lower() == "true"
+        
+        use_correction = os.getenv("USE_CORRECTION_LOOP", "False").lower() == "true"
+        self.use_correction_loop = use_correction and self.use_self_rag
+        self.max_correction_attempts = 3
 
     def _evaluate_response(self, query: str, context: str, response: str, route_name: str):
         """
@@ -62,14 +66,18 @@ class RAGEngine:
             
             print(f"> Relevancia: [{rel_txt}] | Soporte: [{sup_txt}] | Utilidad: [{use_txt}]")
             print(f"> Critica: {metrics.get('critique', 'Sin crítica')}")
+            print("--------------------------------------------------------------")
+            return metrics
 
         except json.JSONDecodeError:
             print(f"> [AVISO] Error de formato en evaluacion JSON")
             print(f"> Recibido: {clean_result}")
+            print("--------------------------------------------------------------")
+            return {"relevant": False, "supported": False, "useful": False, "critique": "Error de formato JSON", "error": True}
         except Exception as e:
             print(f"> [ERROR] Fallo técnico en autoevaluación: {e}")
-        
-        print("--------------------------------------------------------------")
+            print("--------------------------------------------------------------")
+            return {"relevant": False, "supported": False, "useful": False, "critique": f"Error técnico: {e}", "error": True}
 
     def answer(self, user_query: str) -> str:
         """
@@ -128,7 +136,39 @@ class RAGEngine:
         # Lógica de Self-RAG Universal
         if self.use_self_rag:
             if route != Route.UNKNOWN:
-                self._evaluate_response(user_query, context_used, final_response, route_name)
+                metrics = self._evaluate_response(user_query, context_used, final_response, route_name)
+                
+                if self.use_correction_loop and not metrics.get("error"):
+                    attempts = 0
+                    while attempts < self.max_correction_attempts:
+                        if metrics.get("relevant") and metrics.get("supported"):
+                            break
+                        
+                        attempts += 1
+                        print(f"  -> [CORRECTION] Corrigiendo respuesta... Intento {attempts}")
+                        
+                        correction_prompt = f"""
+                        Actúa como un editor experto. La respuesta anterior generada por el sistema no cumplió con los estándares de calidad.
+
+                        Pregunta del usuario: {user_query}
+                        Contexto recuperado: {context_used}
+                        Respuesta anterior: {final_response}
+                        Crítica recibida: {metrics.get('critique')}
+
+                        Por favor, genera una nueva respuesta corregida que resuelva la crítica mencionada y se base estrictamente en el contexto.
+                        IMPORTANTE: Tu respuesta debe contener ÚNICAMENTE el texto corregido. NO incluyas introducciones, saludos, ni frases como "Aquí tienes la versión corregida".
+                        """
+                        
+                        final_response = self.llm_client.generate_text(correction_prompt)
+                        metrics = self._evaluate_response(user_query, context_used, final_response, route_name)
+                        
+                        # Si ocurre un error técnico durante el bucle (ej. fallo de API), abortamos
+                        if metrics.get("error"):
+                            print("  -> [WARN] Error técnico recurrente. Abortando bucle de corrección.")
+                            break
+                    
+                    if attempts >= self.max_correction_attempts:
+                        print("  -> [WARN] Se agotaron los intentos de corrección.")
         else:
             print("  -> [INFO] Self-RAG desactivado por configuracion (.env)")
 

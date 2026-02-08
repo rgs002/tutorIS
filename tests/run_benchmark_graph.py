@@ -51,13 +51,17 @@ def get_user_config():
         use_self_rag_str = os.getenv("USE_SELF_RAG", "True")
         use_self_rag = use_self_rag_str.lower() in ("true", "1", "yes", "on")
 
+        use_correction_str = os.getenv("USE_CORRECTION_LOOP", "False")
+        use_correction = use_correction_str.lower() in ("true", "1", "yes", "on")
+
         print(f" >> Graph Retrieval K (Anclas): {graph_k}")
         print(f" >> Graph Traversal Depth (Saltos): {graph_depth}")
         print(f" >> Graph Anchor Threshold: {graph_threshold}")
         print(f" >> (Ref) Chunk Size: {chunk_size}")
         print(f" >> Use Self RAG: {use_self_rag}")
+        print(f" >> Use Correction Loop: {use_correction}")
 
-        return graph_k, graph_depth, graph_threshold, chunk_size, use_self_rag
+        return graph_k, graph_depth, graph_threshold, chunk_size, use_self_rag, use_correction
     except ValueError:
         print("[ERROR] Las variables de entorno deben ser números válidos.")
         sys.exit(1)
@@ -183,7 +187,7 @@ class InstrumentedRAGEngine(RAGEngine):
 # ---------------- MAIN ----------------
 
 def main():
-    graph_k, graph_depth, graph_threshold, chunk_size, use_self_rag = get_user_config()
+    graph_k, graph_depth, graph_threshold, chunk_size, use_self_rag, use_correction = get_user_config()
     
     q_file = find_questions_file()
     if not q_file:
@@ -245,7 +249,13 @@ def main():
         except Exception as e:
             print(f"\n[ERROR CRÍTICO EN EJECUCIÓN]: {e}")
 
-    suffix = "" if use_self_rag else "_no_eval"
+    if use_self_rag and use_correction:
+        suffix = "_eval"
+    elif not use_self_rag:
+        suffix = "_no_eval"
+    else:
+        suffix = ""
+
     output_filename = f"bench_graph_k{graph_k}_d{graph_depth}_t{graph_threshold}_s{chunk_size}{suffix}.csv"
     output_path = os.path.join(PROJECT_ROOT, 'tests', 'resultados', output_filename)
     os.makedirs(os.path.dirname(output_path), exist_ok=True)

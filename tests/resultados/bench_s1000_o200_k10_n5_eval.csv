@@ -1,0 +1,105 @@
+question,response,time_sec,route,relevant,supported,useful
+¿Cuántas horas debe trabajar cada estudiante por sprint?,"Según la información proporcionada, cada estudiante debe dedicar **36 horas de trabajo efectivo** a la realización del proyecto por sprint.
+
+Este cálculo se obtiene de la siguiente manera:
+*   La carga de trabajo total por sprint es de **40 horas** por persona (20 horas semanales durante dos semanas).
+*   A esas 40 horas se le descuentan **4 horas** dedicadas a las reuniones de Scrum (_Sprint Planning_, _Product Backlog Refinement_, _Sprint Review_ y _Sprint Retrospective_).",27.2,VECTOR,True,True,True
+¿Cómo debo nombrar al apk?,"Basándome en el contexto proporcionado, no es posible determinar cómo debes nombrar el APK.
+
+La información disponible trata sobre la especificación de casos de uso para una aplicación de seguros, plantillas para casos de mal uso, persistencia de datos en Java y conceptos generales de ingeniería de software, pero no menciona ninguna convención de nomenclatura para archivos de aplicación (APK).",25.91,VECTOR,True,True,True
+¿Cuál es la diferencia entre requisitos funcionales y no funcionales? Explícamelo con una tabla comparativa.,"Claro, basándome en la información proporcionada, aquí tienes la diferencia entre requisitos funcionales y no funcionales, explicada con una tabla comparativa.
+
+La diferencia fundamental, según el contexto, es que los **requisitos funcionales** describen **qué** debe hacer el sistema, mientras que los **requisitos no funcionales** describen **cómo** lo hace, es decir, las cualidades y restricciones asociadas a esas funciones.
+
+Aquí tienes una tabla comparativa para ilustrarlo mejor:
+
+| Característica | Requisitos Funcionales | Requisitos No Funcionales |
+| :--- | :--- | :--- |
+| **Definición** | Describen **qué** debe hacer el sistema, sus funciones y tareas específicas. | Describen las **cualidades y restricciones** del sistema mientras realiza sus funciones. |
+| **Enfoque** | Se centran en las funciones, las tareas especificadas y los objetivos del usuario. | Se centran en características de calidad como el rendimiento, la fiabilidad y la capacidad de recuperación. |
+| **Ejemplos** | Basado en la **Adecuación Funcional (ISO 25010)**: <br> - **Completitud funcional:** El sistema cubre todas las tareas y objetivos especificados. <br> - **Corrección funcional:** El sistema proporciona resultados correctos con la precisión necesaria. | Basado en las **Pruebas de Sistema**: <br> - **Rendimiento:** El tiempo de respuesta, el uso de memoria. <br> - **Fiabilidad:** La tasa de fallos del sistema. <br> - **Resistencia:** El comportamiento del sistema bajo cargas máximas. <br> - **Recuperación:** La capacidad de recuperarse tras un fallo grave. |
+| **Documentación** | Describen las funcionalidades del sistema. | Deben documentarse por separado de los requisitos funcionales, aunque estén relacionados con ellos. |",40.14,VECTOR,True,True,True
+¿Cómo se organizan las pruebas unitarias?,"Hola. Según la información disponible, la organización de las pruebas unitarias se aborda desde dos perspectivas principales: su ubicación física dentro de la estructura del proyecto y su planificación estratégica.
+
+1.  **Organización Física (Ubicación en el Proyecto):**
+    En el contexto de proyectos Android, las pruebas unitarias se almacenan en una ubicación específica. La documentación indica que tanto los **Tests Unitarios** como los **Tests de Integración** se organizan dentro de un **Directorio Test**. Este directorio sirve como el contenedor estándar para todas las clases de prueba, manteniéndolas separadas del código fuente de la aplicación y facilitando su gestión y ejecución.
+
+2.  **Organización Estratégica (Planificación):**
+    La estrategia y el alcance de las pruebas se definen en un artefacto clave: el **Plan de Pruebas**. Este documento describe qué se va a probar, cómo y con qué recursos. Específicamente, el plan define las pruebas unitarias que se aplicarán a los componentes y métodos de la aplicación. Por lo tanto, el Plan de Pruebas es la herramienta principal para organizar conceptualmente el esfuerzo de testing, asegurando que se cubran los aspectos necesarios en el nivel de prueba unitario.
+
+En resumen, las pruebas unitarias se organizan físicamente en el **Directorio Test** del proyecto y su alcance y estrategia se definen y documentan en el **Plan de Pruebas**.",39.11,GRAPH,True,True,True
+¿Cómo se puede probar un método de una clase que ejecuta en su propio thread sin usar Thread.Sleep?,"Para probar un método que se ejecuta en su propio `Process Thread` sin utilizar pausas, el enfoque se basa en la **Prueba Unitaria** y la **Verificación de Comportamiento** utilizando las herramientas y conceptos proporcionados.
+
+La estrategia consiste en verificar las interacciones que el código dentro del hilo realiza con sus dependencias, en lugar de comprobar un estado final tras una espera.
+
+1.  **Uso de Objetos Mock**: En la prueba unitaria, se deben utilizar **Objetos Mock** para simular las dependencias con las que interactúa el método asíncrono. El framework **Mockito** es la herramienta mencionada en el contexto para crear estos objetos.
+
+2.  **Verificación de Comportamiento**: Una vez iniciado el método que se ejecuta en el `Process Thread`, la prueba debe centrarse en la **Verificación de Comportamiento**. Esto significa que, en lugar de esperar a que el hilo termine, se utiliza **Mockito** para comprobar si el hilo ha invocado los métodos esperados en los **Objetos Mock**.
+
+3.  **Aplicación Práctica**:
+    *   Dentro de un caso de prueba de **Junit**, se instancia la clase a probar y se le inyectan los **Objetos Mock** necesarios.
+    *   Se invoca el método que inicia la ejecución en el nuevo hilo.
+    *   Inmediatamente después, se utiliza la funcionalidad de **Mockito** para verificar las interacciones. Por ejemplo, se puede usar el método `Atleast` para asegurar que una llamada a un método del mock se ha producido al menos una vez, confirmando así que la lógica del hilo se ha ejecutado.
+
+Este enfoque permite validar la lógica del hilo a través de sus efectos secundarios (interacciones con otras clases), lo cual es un principio fundamental de la **Verificación de Comportamiento** facilitada por frameworks como **Mockito**.",151.76,GRAPH,True,True,False
+"En pruebas con Espresso ¿cómo se puede acceder a un SearchView que se encuentra dentro de un Toolbar, de los que usan el icono de lupa?","Basándome estrictamente en la información proporcionada, el contexto no incluye un ejemplo específico para interactuar con un `SearchView` o el icono de la lupa.
+
+Sin embargo, el contexto sí ofrece una sentencia que podría ser relevante como primer paso si el icono de búsqueda se encuentra dentro del menú de opciones (el menú de tres puntos). La sentencia es:
+
+*   **Abrir el menú de opciones:**
+    `openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext());`
+
+Este comando permite acceder a los elementos que no son visibles directamente en la barra de herramientas. El contexto no proporciona información sobre los pasos siguientes, como hacer clic en un elemento específico de ese menú o interactuar con el campo de texto de búsqueda una vez que aparece.",67.89,VECTOR,True,True,True
+¿Cómo se tiene que denominar el plan de calidad de un Sprint?,"Según el contexto proporcionado, el documento que describe los problemas de calidad y el plan de acción se denomina **informe de calidad**.",25.09,VECTOR,True,True,True
+¿Cuál es la versión exacta de la plataforma Jakarta EE que se utiliza en el curso?,"Según la información del contexto, la versión que se utiliza como referencia en la bibliografía complementaria del curso es **Jakarta EE Platform 9.1**.
+
+Esta información se encuentra en la sección ""Bibliografía complementaria"", donde se cita el siguiente documento:
+*   ""Eclipse Foundation: Jakarta EE Platform 9.1 Specification""",21.3,VECTOR,True,True,True
+¿Qué puerto utiliza por defecto la consola de administración de Glassfish?,"Según la información proporcionada, el puerto que utiliza por defecto la consola de administración de Glassfish es el **4848**.
+
+Puedes acceder a ella a través de la dirección `localhost:4848`.",25.6,VECTOR,True,True,True
+¿Qué anotación se utiliza en JPA para indicar que un atributo no debe ser persistido en la base de datos?,"Según la información proporcionada, la anotación que se utiliza en JPA para indicar que un atributo no debe ser persistido en la base de datos es **`@Transient`**.
+
+El contexto especifica:
+*   El estado persistente de la entidad lo forman los valores de todos sus atributos/propiedades **excepto aquellos anotados con `@Transient`**.
+*   En la tabla de anotaciones, se describe `@Transient` como la que ""Indica que el atributo/propiedad no se hace persistente"".",22.94,VECTOR,True,True,True
+¿Cuál es el nombre del plugin de Maven recomendado para desplegar aplicaciones en Glassfish?,"Basándome en el contexto proporcionado, no es posible determinar el nombre del plugin de Maven recomendado para desplegar aplicaciones en Glassfish.
+
+El texto del contexto consiste en una serie de números y símbolos (`/21 /23 /29 /24 □ ...`) y no contiene información legible sobre plugins de Maven, Glassfish o ingeniería de software.",26.83,VECTOR,True,True,True
+¿Dónde puedo encontrar las reglas a aplicar para la nomenclatura de las clases de prueba?,"Según la información proporcionada, puedes encontrar las reglas para la nomenclatura de las clases de prueba en la sección **""Nomenclatura y organización de las clases de prueba""**.
+
+Las reglas son las siguientes:
+
+### Pruebas Unitarias:
+*   **Directorio:** Se almacenan en el directorio `test`.
+*   **Nomenclatura:** Se denominan `<NombreClase>Test.java`, donde `<NombreClase>` es el nombre de la clase que se está probando.
+*   **Paquete:** Se definen en un paquete con el mismo nombre que el paquete donde se encuentra la clase bajo prueba.
+
+### Pruebas de Integración:
+*   **Directorio:** Se almacenan en el directorio `test`.
+*   **Nomenclatura:** Se denominan `<NombreClase>ITest.java`, donde `<NombreClase>` es el nombre de la clase principal bajo prueba.
+*   **Paquete:** Se definen en un paquete con el mismo nombre que el paquete donde se encuentra la clase principal bajo prueba.",26.32,VECTOR,True,True,True
+Explicame la relevancia del testInstrumentationRunner en la configuración de pruebas para Android y cómo coordina la ejecución en dispositivos reales.,"Basado en la información proporcionada, el `testInstrumentationRunner`, concretamente la clase `Androidx.Test.Runner.Androidjunitrunner`, es el componente clave para la ejecución de pruebas instrumentadas en Android.
+
+Su relevancia principal es que actúa como el ejecutor para los **Test de Interfaz Gráfica (Artefacto)**. Según el contexto, este tipo de pruebas, que utilizan frameworks como **Espresso (Tecnologia)**, deben ejecutarse en dispositivos reales o emulados para poder verificar la funcionalidad y apariencia de la interfaz de usuario.
+
+La coordinación en dispositivos reales se basa en su rol como ""runner"". Es el mecanismo que permite que las pruebas organizadas en el **Directorio Androidtest (Artefacto)** se ejecuten directamente en el entorno de un dispositivo Android, posibilitando así la validación de la aplicación en un contexto real.",75.67,GRAPH,True,True,True
+¿Puede haber valores anómalos en las fechas proporcionadas dentro del servicio de datos?,"Sí, según la información del contexto, se contempla la posibilidad de que existan valores anómalos en las fechas.
+
+Específicamente, el punto 9 del contexto indica:
+
+> Existen criterios de confirmación consensuados con el *Product Owner* para tratar situaciones que puedan considerarse anómalas, como **la ausencia de fecha en ciertos elementos de una colección** a la hora de ordenar dicha colección por fecha.
+
+Esto confirma que el sistema prevé y tiene un plan de acción para manejar anomalías relacionadas con las fechas, como por ejemplo, que un dato de tipo fecha esté ausente cuando se espera.",29.08,VECTOR,True,True,True
+¿Hay que tratar casos de valores anómalos en las fechas para los criterios de confirmación?,"Sí, es fundamental tratar los casos de valores anómalos en las fechas al definir los criterios de confirmación para una historia de usuario.
+
+Analizando la información de las asignaturas, los **Test de Aceptación** son los criterios que una **User Story** debe cumplir para ser considerada completa. Estos tests no solo deben verificar el ""camino feliz"" (cuando el usuario introduce los datos correctamente), sino también cómo se comporta el sistema ante entradas inesperadas o incorrectas.
+
+Este proceso se conoce como **Validación**, cuyo objetivo es asegurar que el software satisface las necesidades del usuario, lo que incluye gestionar los errores de entrada de datos de forma adecuada. La documentación de la asignatura de Procesos de Ingeniería de Software, en particular el fichero `ps-2324-t4-4-jsf.pdf`, hace referencia al uso de **Validadores Estándar**. Estas herramientas están diseñadas específicamente para verificar la validez de los datos que introduce el usuario.
+
+Por lo tanto, al definir los criterios de confirmación, deberías incluir escenarios que prueben:
+*   Fechas con formato incorrecto.
+*   Fechas inexistentes (ej. 30 de febrero).
+*   Fechas que están fuera de un rango lógico permitido para la funcionalidad (ej. una fecha de nacimiento en el futuro).
+
+El sistema debería ser capaz de identificar estos valores anómalos y responder de manera controlada, por ejemplo, mostrando un mensaje de error claro al usuario, en lugar de fallar o procesar datos incorrectos.",58.06,GRAPH,True,True,True
