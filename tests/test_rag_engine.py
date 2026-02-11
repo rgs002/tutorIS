@@ -74,8 +74,6 @@ def main():
         query_busqueda = "¿Cuántas horas debe trabajar cada estudiante por sprint?"
         
         print(f"  -> Buscando: '{query_busqueda}'...")
-        # Tu nuevo código devuelve una lista de strings directamente
-        # Al quitar k=2, usará el valor por defecto de la clase (normalmente 5)
         textos_encontrados = retriever.retrieve(query_busqueda)
         
         print(f"  -> Documentos encontrados: {len(textos_encontrados)}")

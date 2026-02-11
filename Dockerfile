@@ -1,4 +1,4 @@
-# Usar Python 3.11 tal y como requieren tus dependencias (langchain-neo4j)
+# Usar Python 3.11 tal y como requieren las dependencias (langchain-neo4j)
 FROM python:3.11-slim
 
 # Directorio de trabajo en el contenedor

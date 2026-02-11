@@ -236,7 +236,6 @@ def main():
     app_main._engine_instance = None
     ConfiguredGraphRetriever = create_configured_graph_retriever_class(graph_k, graph_depth, graph_threshold)
 
-    # Parcheamos GraphRetriever en rag_engine.engine, que es donde RAGEngine lo importa/usa
     with patch('builtins.input', side_effect=simulated_input), \
          patch('main.get_rag_response', side_effect=measured_get_rag_response), \
          patch('main.RAGEngine', InstrumentedRAGEngine), \

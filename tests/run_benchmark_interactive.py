@@ -154,7 +154,6 @@ class InstrumentedRAGEngine(RAGEngine):
     """
     def __init__(self):
         super().__init__()
-        # Inyectar espías en los componentes creados por el motor
         if hasattr(self, 'router'):
             self.router.route = capture_route_side_effect(self.router.route)
         if hasattr(self, 'llm_client'):
