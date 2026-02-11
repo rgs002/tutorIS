@@ -1,4 +1,4 @@
-# TutorIS: Asistente Educativo especialista en asignaturas de Ingeniería del Software del grado de Ingeniería Informática, Universidad de Cantabria
+# TutorIS: Asistente Educativo especialista en asignaturas de Ingeniería del Software del grado de Ingeniería Informática
 
 TutorIS es un sistema de tutoría inteligente diseñado para el apoyo docente en asignaturas de Ingeniería del Software. La arquitectura emplea una estrategia de generación aumentada por recuperación (RAG) híbrida, integrando una base de datos vectorial (ChromaDB) y un grafo de conocimiento (Neo4j).
 
@@ -15,7 +15,7 @@ TutorIS es un sistema de tutoría inteligente diseñado para el apoyo docente en
 
 1.  **Clonar el repositorio:**
     ```bash
-    git clone https://github.com/rgs002/tutorIS.git
+    git clone https://anonymous.4open.science/r/tutorIS-4D3B/
     cd tutorIS
     ```
 
