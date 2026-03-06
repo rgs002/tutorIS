@@ -59,6 +59,15 @@ Nota: Es imprescindible crear el directorio /data/raw y que los subdirectorios q
 
 ---
 
+## Seguridad
+
+| | |
+|---|---|
+| 📋 Herramientas y configuración | [Análisis Estático (Bandit), Auditoría de Dependencias (pip-audit), Escaneo de Contenedores/FS (Trivy)] |
+| 🔍 Resultados de las últimas auditorías | [Actions → Security Audit](../../actions/workflows/security.yml) |
+
+---
+
 ## Estructura de Directorios
 
 * **src/rag_engine/**: Lógica del motor de inferencia, enrutamiento y autoevaluación reflexiva.

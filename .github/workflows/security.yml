@@ -1,0 +1,65 @@
+name: Security Audit
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  security_audit:
+    name: Security audit
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pip-audit bandit
+
+      - name: Run pip-audit
+        run: |
+          pip-audit -r requirements.txt --format json --output pip-audit.json --progress-spinner off || true
+
+      - name: Run Bandit
+        run: |
+          bandit -r src/ -f json -o bandit.json -q || true
+
+      - name: Install and Run Trivy
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+          trivy fs . --format json --output trivy.json --exit-code 0 --quiet
+
+      - name: Generate Audit Summary
+        if: always()
+        run: |
+          python3 .github/scripts/audit_summary.py
+
+      - name: Publish summary
+        if: always()
+        run: |
+          cat audit-summary.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-audit-reports
+          path: |
+            pip-audit.json
+            bandit.json
+            trivy.json
+            audit-summary.md
+          retention-days: 30
+
+      - name: Security Gate
+        run: |
+          python3 .github/scripts/audit_gate.py

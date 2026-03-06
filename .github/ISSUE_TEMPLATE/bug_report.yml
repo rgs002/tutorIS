@@ -1,0 +1,54 @@
+name: Bug Report
+description: Report a bug to help us improve.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      placeholder: Describe the bug clearly and concisely.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      placeholder: What you expected to happen.
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Please paste any relevant logs here.
+      render: text
+  - type: checkboxes
+    id: platforms
+    attributes:
+      label: Affected Platforms
+      options:
+        - label: Local Development (Linux)
+        - label: Docker
+        - label: CI/CD Pipeline
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - high
+        - low
+    validations:
+      required: true

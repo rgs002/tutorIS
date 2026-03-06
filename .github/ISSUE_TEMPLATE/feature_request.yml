@@ -1,0 +1,31 @@
+name: Feature Request
+description: Suggest an idea for this project.
+labels: ["feature"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      placeholder: Is your feature request related to a problem? Please describe.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      placeholder: Describe the solution you'd like.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      placeholder: Describe any alternative solutions or features you've considered.
+  - type: checkboxes
+    id: platforms
+    attributes:
+      label: Affected Platforms
+      options:
+        - label: Local Development (Linux)
+        - label: Docker
+        - label: CI/CD Pipeline

@@ -1,0 +1,26 @@
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+  categories:
+    - title: "🚀 Nuevas funcionalidades"
+      labels:
+        - feature
+    - title: "🐛 Correcciones"
+      labels:
+        - bug
+    - title: "🔒 Seguridad"
+      labels:
+        - security
+    - title: "⚙️ DevOps / Infraestructura"
+      labels:
+        - devops
+    - title: "📚 Documentación"
+      labels:
+        - documentation
+    - title: "🔧 Refactor"
+      labels:
+        - refactor
+    - title: "Otros cambios"
+      labels:
+        - "*"
